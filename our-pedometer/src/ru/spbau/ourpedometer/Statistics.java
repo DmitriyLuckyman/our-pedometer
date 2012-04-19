@@ -5,7 +5,7 @@ package ru.spbau.ourpedometer;
  * User: Alina
  * Date: 19.04.12
  * Time: 15:08
- * To change this template use File | Settings | File Templates.
+ * Representes coordinates & time when changed.
  */
 public class Statistics {
     Float[] coordinates;
