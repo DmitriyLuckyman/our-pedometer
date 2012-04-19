@@ -1,4 +1,4 @@
-package com.example;
+package ru.spbau.ourpedometer;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import com.example.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,8 +73,6 @@ public class MyActivity extends Activity implements SensorEventListener
                 }
             }
         }
-
-
 
         valueX = (TextView)findViewById(R.id.value_x);
         valueY = (TextView)findViewById(R.id.value_y);
