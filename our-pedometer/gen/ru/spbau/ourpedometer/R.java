@@ -5,7 +5,7 @@
  * should not be modified by hand.
  */
 
-package com.example;
+package ru.spbau.ourpedometer;
 
 public final class R {
     public static final class attr {
@@ -14,17 +14,23 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int LinearLayout01=0x7f05000c;
+        public static final int LinearLayout01=0x7f050012;
         public static final int TableLayout01=0x7f050000;
-        public static final int TableRow01=0x7f05000a;
-        public static final int ViewStub01=0x7f05000b;
-        public static final int button_start=0x7f05000d;
+        public static final int TableRow01=0x7f050010;
+        public static final int ViewStub01=0x7f050011;
+        public static final int button_start=0x7f050013;
+        public static final int label_num=0x7f05000b;
+        public static final int label_speed=0x7f05000e;
         public static final int label_x=0x7f050002;
         public static final int label_y=0x7f050005;
         public static final int label_z=0x7f050008;
+        public static final int num=0x7f05000c;
+        public static final int row_num=0x7f05000a;
+        public static final int row_speed=0x7f05000d;
         public static final int row_x=0x7f050001;
         public static final int row_y=0x7f050004;
         public static final int row_z=0x7f050007;
+        public static final int speed=0x7f05000f;
         public static final int value_x=0x7f050003;
         public static final int value_y=0x7f050006;
         public static final int value_z=0x7f050009;

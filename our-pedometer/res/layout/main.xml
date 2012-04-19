@@ -54,6 +54,40 @@
                       android:layout_marginLeft="5dip"></TextView>
     </TableRow>
 
+    <TableRow 	android:layout_height="wrap_content"
+                  android:layout_width="fill_parent"
+                  android:id="@+id/row_num"
+                  android:layout_margin="5dip">
+        <TextView	android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:text="Number of steps:"
+                     android:id="@+id/label_num"
+                     android:gravity="right"></TextView>
+        <TextView 	android:layout_height="wrap_content"
+                      android:text="-"
+                      android:layout_width="fill_parent"
+                      android:layout_weight="1"
+                      android:id="@+id/num"
+                      android:layout_marginLeft="5dip"></TextView>
+    </TableRow>
+
+    <TableRow 	android:layout_height="wrap_content"
+                  android:layout_width="fill_parent"
+                  android:id="@+id/row_speed"
+                  android:layout_margin="5dip">
+        <TextView	android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:text="Speed (steps per s):"
+                     android:id="@+id/label_speed"
+                     android:gravity="right"></TextView>
+        <TextView 	android:layout_height="wrap_content"
+                      android:text="-"
+                      android:layout_width="fill_parent"
+                      android:layout_weight="1"
+                      android:id="@+id/speed"
+                      android:layout_marginLeft="5dip"></TextView>
+    </TableRow>
+
     <TableRow 	android:id="@+id/TableRow01"
                   android:layout_height="wrap_content"
                   android:layout_width="fill_parent">
@@ -71,4 +105,6 @@
                         android:id="@+id/button_start"></Button>
         </LinearLayout>
     </TableRow>
+
+
 </TableLayout>

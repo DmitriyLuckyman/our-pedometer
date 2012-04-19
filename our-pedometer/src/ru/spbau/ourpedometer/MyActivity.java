@@ -19,8 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyActivity extends Activity implements SensorEventListener
-{
+public class MyActivity extends Activity implements SensorEventListener {
     Button startButton;
 
     SensorManager sensorManager;
@@ -28,7 +27,11 @@ public class MyActivity extends Activity implements SensorEventListener
 
     TextView valueX;
     TextView valueY;
+
+
     TextView valueZ;
+    TextView number;
+    TextView speed;
 
     List<List<Float>> values;
     boolean isRecording = false;
@@ -36,21 +39,30 @@ public class MyActivity extends Activity implements SensorEventListener
     BufferedWriter writer;
 
 
+    ///todo: modify
+    double prevRes = 12;
+
+    int numberOfSteps = 0;
+
+    long timeOfStart;
+
+
     View.OnClickListener startListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             isRecording = !isRecording;
-            if(isRecording) {
+            if (isRecording) {
                 values.clear();
-
-                try{
+                try {
 
                     File file = new File(Environment.getExternalStorageDirectory() + File.separator + "test.txt");
                     writer = new BufferedWriter(new FileWriter(file));
 
                     writer.newLine();
-                    writer.write("Start!");
 
+                    numberOfSteps = 0;
+                    number.setText("0");
+                    timeOfStart = System.currentTimeMillis();
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -71,70 +83,83 @@ public class MyActivity extends Activity implements SensorEventListener
         super.onPause();
     }
 
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
 
         values = new ArrayList<List<Float>>();
-        sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         List<Sensor> sensors = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
-        if(!sensors.isEmpty()) {
+        if (!sensors.isEmpty()) {
             for (Sensor sensor : sensors) {
-                switch(sensor.getType()) {
+                switch (sensor.getType()) {
                     case Sensor.TYPE_ACCELEROMETER:
-                        if(accelerometerSensor == null) accelerometerSensor = sensor;
+                        if (accelerometerSensor == null) accelerometerSensor = sensor;
                         break;
                 }
-                if(accelerometerSensor != null){
+                if (accelerometerSensor != null) {
                     break;
                 }
             }
         }
 
 
+        valueX = (TextView) findViewById(R.id.value_x);
+        valueY = (TextView) findViewById(R.id.value_y);
+        valueZ = (TextView) findViewById(R.id.value_z);
+        number = (TextView) findViewById(R.id.num);
+        speed = (TextView) findViewById(R.id.speed);
 
-        valueX = (TextView)findViewById(R.id.value_x);
-        valueY = (TextView)findViewById(R.id.value_y);
-        valueZ = (TextView)findViewById(R.id.value_z);
-
-        startButton = (Button)findViewById(R.id.button_start);
+        startButton = (Button) findViewById(R.id.button_start);
         startButton.setOnClickListener(startListener);
     }
 
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        if(!isRecording) return;
-        final List<Float> lValues = new ArrayList<Float>();
-        try {
-            writer.newLine();
-        } catch (IOException e) {
-            System.err.println("Error during collecting statistics!");
-            e.printStackTrace();
-        }
-        for(float value: sensorEvent.values) {
-            lValues.add(value);
-            try {
-                writer.write(String.valueOf(value) + " ");
-            } catch (IOException e) {
-                System.err.println("Error during collecting statistics!");
-                e.printStackTrace();
-            }
-        }
-
-        try {
-            writer.flush();
-        } catch (IOException e) {
-            System.err.println("Error during saving statistics!");
-            e.printStackTrace();
-        }
-
-        switch(sensorEvent.sensor.getType()) {
+        switch (sensorEvent.sensor.getType()) {
             case Sensor.TYPE_ACCELEROMETER:
+                if (!isRecording) return;
+                double result = 0;
+                final List<Float> lValues = new ArrayList<Float>();
+                try {
+                    writer.newLine();
+                } catch (IOException e) {
+                    System.err.println("Error during collecting statistics!");
+                    e.printStackTrace();
+                }
+                for (float value : sensorEvent.values) {
+                    lValues.add(value);
+                    result += Math.pow(value, 2);
+                    try {
+                        writer.write(String.valueOf(value) + " ");
+                    } catch (IOException e) {
+                        System.err.println("Error during collecting statistics!");
+                        e.printStackTrace();
+                    }
+                }
+
+                result = Math.sqrt(result);
+                //todo: magicNumber
+                if (getPrevRes() < 12 && result > 12) {
+                    numberOfSteps++;
+                    number.setText(String.valueOf(getNumberOfSteps()));
+                    speed.setText(String.valueOf(1000.0 * getNumberOfSteps() /
+                            (System.currentTimeMillis() - getTimeOfStart())));
+                }
+                prevRes = result;
+
+                try {
+                    writer.flush();
+                } catch (IOException e) {
+                    System.err.println("Error during saving statistics!");
+                    e.printStackTrace();
+                }
                 valueX.setText(String.valueOf(sensorEvent.values[SensorManager.DATA_X]));
                 valueY.setText(String.valueOf(sensorEvent.values[SensorManager.DATA_Y]));
                 valueZ.setText(String.valueOf(sensorEvent.values[SensorManager.DATA_Z]));
@@ -145,5 +170,18 @@ public class MyActivity extends Activity implements SensorEventListener
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
+    }
+
+    public double getPrevRes() {
+        return prevRes;
+    }
+
+
+    public long getTimeOfStart() {
+        return timeOfStart;
+    }
+
+    public int getNumberOfSteps() {
+        return numberOfSteps;
     }
 }
