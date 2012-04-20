@@ -17,7 +17,7 @@ public class StatisticsCollector implements StatsReader, StatsSaver {
 
     @Override
     public Iterable<StatisticsBean> getStatsByDateRange(Date startTime, Date stopTime) {
-        return new ArrayList<StatisticsBean>();
+        return values;
     }
 
     @Override
