@@ -1,5 +1,7 @@
 package ru.spbau.ourpedometer;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -16,8 +18,9 @@ public class MemoryStatisticsCollector implements StatisticsCollector {
     public Iterable<StatisticsBean> getStatsByDateRange(Date startTime, Date stopTime) {
         List<StatisticsBean> result = new ArrayList<StatisticsBean>();
         synchronized (data){
-            Collections.copy(result, data);
+            result.addAll(data);
         }
+        Log.d(MemoryStatisticsCollector.class.getName(),"" + result.size());
         return result;
     }
 

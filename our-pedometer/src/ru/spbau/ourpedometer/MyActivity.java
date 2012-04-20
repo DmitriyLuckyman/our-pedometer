@@ -12,8 +12,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
-import java.util.Timer;
 import java.util.TimerTask;
 
 public class MyActivity extends Activity {
@@ -28,7 +26,6 @@ public class MyActivity extends Activity {
     TextView speed;
     PedometerRemoteInterface aService;
 
-    private TimerTask timerTask;
     View.OnClickListener startListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -39,7 +36,9 @@ public class MyActivity extends Activity {
                                     mConnection, Context.BIND_AUTO_CREATE);
             } else {
                 try {
-                    number.setText(aService.getSteps());
+                    final int steps = aService.getSteps();
+                    number.setText("" + steps);
+                    Log.v(this.getClass().getName(), "Steps=" + steps);
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
@@ -66,6 +65,7 @@ public class MyActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        startService(new Intent(this, AccelerometerService.class));
         setContentView(R.layout.main);
 
         valueX = (TextView) findViewById(R.id.value_x);
