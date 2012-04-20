@@ -20,12 +20,12 @@
             android:textColor="#000000"
             android:textSize="20px"/>
     <ProgressBar
-            android:id="@+id/aimSteps"
+            android:id="@+id/process"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:minWidth="200px"
             android:max="100"
-            android:aimSteps="0"
+            android:process="0"
             style="@android:style/Widget.ProgressBar.Horizontal"
             android:layout_alignParentRight="true"
             android:indeterminateOnly="false"/>
