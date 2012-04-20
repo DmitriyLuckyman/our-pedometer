@@ -2,6 +2,7 @@ package ru.spbau.ourpedometer;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -74,12 +75,10 @@ public class MyActivity extends Activity implements SensorEventListener {
     @Override
     protected void onResume() {
         super.onResume();
-        sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
     }
 
     @Override
     protected void onPause() {
-        sensorManager.unregisterListener(this);
         super.onPause();
     }
 
@@ -89,25 +88,8 @@ public class MyActivity extends Activity implements SensorEventListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        startService(new Intent(this, AccelerometerService.class));
         setContentView(R.layout.main);
-
-
-        values = new ArrayList<List<Float>>();
-        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        List<Sensor> sensors = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
-        if (!sensors.isEmpty()) {
-            for (Sensor sensor : sensors) {
-                switch (sensor.getType()) {
-                    case Sensor.TYPE_ACCELEROMETER:
-                        if (accelerometerSensor == null) accelerometerSensor = sensor;
-                        break;
-                }
-                if (accelerometerSensor != null) {
-                    break;
-                }
-            }
-        }
-
 
         valueX = (TextView) findViewById(R.id.value_x);
         valueY = (TextView) findViewById(R.id.value_y);
@@ -122,8 +104,7 @@ public class MyActivity extends Activity implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        switch (sensorEvent.sensor.getType()) {
-            case Sensor.TYPE_ACCELEROMETER:
+        if(Sensor.TYPE_ACCELEROMETER == sensorEvent.sensor.getType()) {
                 if (!isRecording) return;
                 double result = 0;
                 final List<Float> lValues = new ArrayList<Float>();
@@ -164,7 +145,6 @@ public class MyActivity extends Activity implements SensorEventListener {
                 valueY.setText(String.valueOf(sensorEvent.values[SensorManager.DATA_Y]));
                 valueZ.setText(String.valueOf(sensorEvent.values[SensorManager.DATA_Z]));
                 values.add(lValues);
-                break;
         }
     }
 

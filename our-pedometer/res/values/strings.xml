@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">SE</string>
+    <string name="start.button.text">Start recording</string>
+    <string name="speed.label">Speed (steps per s):</string>
+    <string name="default.value">-</string>
+    <string name="steps.label">Number of steps:</string>
+    <string name="z.axis.label">Z:</string>
+    <string name="Y.axis.label">Y:</string>
+    <string name="X.axis.label">X:</string>
 </resources>

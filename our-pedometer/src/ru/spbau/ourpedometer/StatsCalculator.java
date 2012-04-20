@@ -26,12 +26,12 @@ public class StatsCalculator implements StatisticsCalculator {
 
         for(StatisticsBean st : statsList){
             if (Math.sqrt(Math.pow(st.x(), 2) + Math.pow(st.z(), 2) + Math.pow(st.z(), 2)) > stepHeightThreshold) {
-                if (stepFlag == false) {
+                if (!stepFlag) {
                     beginStepTime = st.time();
                     stepFlag = true;
                 }
             } else {
-                if (stepFlag == true) {
+                if (stepFlag) {
                     if (st.time() - beginStepTime > stepWidthThreshold) {
                         steps++;
                     }
@@ -72,7 +72,6 @@ public class StatsCalculator implements StatisticsCalculator {
         return steps/ currentTimeInMillis(timeUnit);
     }
 
-    @Override
     public float minSpeed(Date startTime, Date stopTime, TimeUnit timeUnit) {
         int delta = currentTimeInMillis(timeUnit);
         Long time = startTime.getTime() + delta;
@@ -91,7 +90,6 @@ public class StatsCalculator implements StatisticsCalculator {
         return min;
     }
 
-    @Override
     public float maxSpeed(Date startTime, Date stopTime, TimeUnit timeUnit) {
         int delta = currentTimeInMillis(timeUnit);
         Long time = startTime.getTime() + delta;

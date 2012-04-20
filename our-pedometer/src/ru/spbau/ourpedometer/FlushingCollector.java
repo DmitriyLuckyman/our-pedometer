@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class FlushingCollector extends StatisticsCollector {
+public abstract class FlushingCollector implements StatisticsCollector {
     final protected ArrayList<StatisticsBean> buffer;
     final private int bufferCapacity;
 
