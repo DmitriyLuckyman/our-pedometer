@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class MemoryStatisticsCollector implements StatisticsCollector {
-    final ArrayList<StatisticsBean> data;
+    final private ArrayList<StatisticsBean> data;
 
     public MemoryStatisticsCollector () {
         data = new ArrayList<StatisticsBean>();
