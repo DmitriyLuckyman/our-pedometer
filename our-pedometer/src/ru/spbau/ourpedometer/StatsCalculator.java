@@ -54,22 +54,60 @@ public class StatsCalculator implements StatisticsCalculator {
         stepWidthThreshold = threshold;
     }
 
+    private int convert(TimeUnit timeUnit){
+        switch (timeUnit){
+            case MINUTES:
+                return  60*1000;
+
+            case SECONDS:
+                return  1000;
+
+            default:
+                return  1000;
+        }
+    }
+
     @Override
     public float speed(Date startTime, Date stopTime, TimeUnit timeUnit) {
         int steps = steps(startTime, stopTime);
-        int div;
-        switch (timeUnit){
-            case MINUTES:
-                div = 60*1000;
-                break;
-            case SECONDS:
-                div = 1000;
-                break;
-            default:
-                div = 1000;
-                break;
+        return steps/convert(timeUnit);
+    }
+
+    @Override
+    public float minSpeed(Date startTime, Date stopTime, TimeUnit timeUnit) {
+        int conv = convert(timeUnit);
+        Long time = startTime.getTime() + conv;
+        float min = speed(startTime, new Date(time), timeUnit);
+
+
+        while(time + conv <= stopTime.getTime()){
+            float speed = speed(new Date(time), new Date(time + conv), timeUnit);
+            if(speed < min){
+                min = speed;
+            }
+
+            time += conv;
         }
 
-        return steps/div;
+        return min;
+    }
+
+    @Override
+    public float maxSpeed(Date startTime, Date stopTime, TimeUnit timeUnit) {
+        int conv = convert(timeUnit);
+        Long time = startTime.getTime() + conv;
+        float max = speed(startTime, new Date(time), timeUnit);
+
+
+        while(time + conv <= stopTime.getTime()){
+            float speed = speed(new Date(time), new Date(time + conv), timeUnit);
+            if(speed > max){
+                max = speed;
+            }
+
+            time += conv;
+        }
+
+        return max;
     }
 }

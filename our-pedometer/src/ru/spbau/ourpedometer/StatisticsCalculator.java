@@ -10,5 +10,8 @@ public interface StatisticsCalculator {
     public void setStepWidthThreshold(int threshold);
 
     public int steps(Date startTime, Date stopTime);
+
     public float speed(Date startTime, Date stopTime, TimeUnit timeUnit);
+    public float minSpeed(Date startTime, Date stopTime, TimeUnit timeUnit);
+    public float maxSpeed(Date startTime, Date stopTime, TimeUnit timeUnit);
 }
