@@ -4,6 +4,6 @@ import java.util.Date;
 
 
 public interface StatsGetter {
-    public void init (Date start);
+    public void initGetter (Date start);
     public Statistics getNext();
 }
