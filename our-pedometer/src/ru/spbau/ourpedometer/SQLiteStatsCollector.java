@@ -49,6 +49,11 @@ public class SQLiteStatsCollector extends FlushingCollector {
     }
 
     @Override
+    protected void closeStorage() {
+        database.close();
+    }
+
+    @Override
     public Iterable<StatisticsBean> getStatsByDateRangeFromStorage(Date startTime, Date stopTime) {
         String selection = "time > " + startTime.getTime() + " AND time < " + stopTime.getTime();
         Cursor cur = database.query(TABLE_NAME, null, selection, null, null, null, null);

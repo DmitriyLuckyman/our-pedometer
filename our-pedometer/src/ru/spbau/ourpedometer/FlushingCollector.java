@@ -24,12 +24,19 @@ public abstract class FlushingCollector implements StatisticsCollector {
         }
     }
 
-    public Iterable<StatisticsBean> getStatsByDateRange(Date startTime, Date stopTime)
-    {
+    @Override
+    public Iterable<StatisticsBean> getStatsByDateRange(Date startTime, Date stopTime) {
         flush(buffer);
         return getStatsByDateRangeFromStorage(startTime, stopTime);
     }
 
+    @Override
+    public void close() {
+        flush(buffer);
+        closeStorage();
+    }
+
     protected abstract Iterable<StatisticsBean> getStatsByDateRangeFromStorage(Date startTime, Date stopTime);
     protected abstract void flush(List<StatisticsBean> buffer);
+    protected abstract void closeStorage();
 }
