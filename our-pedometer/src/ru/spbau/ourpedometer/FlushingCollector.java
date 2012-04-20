@@ -2,6 +2,7 @@ package ru.spbau.ourpedometer;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public abstract class FlushingCollector implements StatisticsCollector {
@@ -13,19 +14,22 @@ public abstract class FlushingCollector implements StatisticsCollector {
         buffer = new ArrayList<StatisticsBean>(bufferCapacity);
     }
 
-    protected List<StatisticsBean> getBuffer() {
-        return Collections.unmodifiableList(buffer);
-    }
-
     @Override
     public void save(StatisticsBean statistics) {
         buffer.add(statistics);
         if (buffer.size() >= bufferCapacity)
         {
-            flush();
+            flush(Collections.unmodifiableList(buffer));
             buffer.clear();
         }
     }
 
-    protected abstract void flush();
+    public Iterable<StatisticsBean> getStatsByDateRange(Date startTime, Date stopTime)
+    {
+        flush(buffer);
+        return getStatsByDateRangeFromStorage(startTime, stopTime);
+    }
+
+    protected abstract Iterable<StatisticsBean> getStatsByDateRangeFromStorage(Date startTime, Date stopTime);
+    protected abstract void flush(List<StatisticsBean> buffer);
 }
