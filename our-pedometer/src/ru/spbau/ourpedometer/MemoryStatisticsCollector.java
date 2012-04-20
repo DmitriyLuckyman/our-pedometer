@@ -25,4 +25,9 @@ public class MemoryStatisticsCollector implements StatisticsCollector {
     public void save(StatisticsBean statistics) {
         data.add(statistics);
     }
+
+    @Override
+    public void close() {
+        data.clear();
+    }
 }
