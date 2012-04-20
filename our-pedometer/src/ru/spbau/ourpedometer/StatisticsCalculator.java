@@ -1,21 +1,14 @@
 package ru.spbau.ourpedometer;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public interface StatisticsCalculator {
-    public void start();
-    public void stop();
+    public void setStepHeightThreshold(float threshold);
+    public void setStepWidthThreshold(int threshold);
 
-    public void save(Statistics statistics) throws IOException;
-
-    public List<Statistics> get() throws IOException;
-    public List<Statistics> get(Long time) throws IOException;
-
-    public int steps();
-    public int steps(Long time);
-
-    public int speed();
-    public int speed(Long time);
+    public int steps(Date startTime, Date stopTime);
+    public float speed(Date startTime, Date stopTime, TimeUnit timeUnit);
 }
