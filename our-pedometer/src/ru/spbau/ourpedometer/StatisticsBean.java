@@ -1,10 +1,10 @@
 package ru.spbau.ourpedometer;
 
-public class Statistics {
+public class StatisticsBean {
     private Float[] coordinates;
     private Long time;  // msec
 
-    public Statistics(Float x, Float y, Float z, Long time){
+    public StatisticsBean(Float x, Float y, Float z, Long time){
         coordinates = new Float[]{x, y, z};
         this.time = time;
     }
