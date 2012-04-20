@@ -10,6 +10,7 @@ public class RepeatingAlarmService extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        context.sendBroadcast(intent);
         Toast.makeText(context, "It's Service Time!", Toast.LENGTH_LONG).show();
         Log.v(this.getClass().getName(), "Timed alarm onReceive() started at time: " + new java.sql.Timestamp(System.currentTimeMillis()).toString());
     }

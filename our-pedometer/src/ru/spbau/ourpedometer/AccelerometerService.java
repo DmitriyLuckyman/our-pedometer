@@ -1,5 +1,7 @@
 package ru.spbau.ourpedometer;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +11,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.os.SystemClock;
 import android.util.Log;
 
 import java.util.Date;
@@ -16,8 +19,12 @@ import java.util.List;
 
 public class AccelerometerService extends Service implements SensorEventListener {
 
+    public static final int FIRST_RUN = 2000;
+    public static final int INTERVAL= 1000;
     private SensorManager sensorManager;
     private Sensor accelerometerSensor;
+    private AlarmManager alarmManager;
+    private static final int REQUEST_CODE = 1234567890;
 
     @Override
     public void onCreate() {
@@ -52,6 +59,15 @@ public class AccelerometerService extends Service implements SensorEventListener
                     break;
                 }
             }
+            Intent intent = new Intent(this, RepeatingAlarmService.class);
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(this, REQUEST_CODE, intent, 0);
+
+                    alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+                    alarmManager.setRepeating(
+                            AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                            SystemClock.elapsedRealtime() + FIRST_RUN,
+                            INTERVAL,
+                            pendingIntent);
         }
     }
 
