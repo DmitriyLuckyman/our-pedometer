@@ -11,34 +11,59 @@ public final class R {
     public static final class attr {
     }
     public static final class drawable {
-        public static final int ic_launcher=0x7f020000;
+        public static final int flower=0x7f020000;
+        public static final int ic_launcher=0x7f020001;
+        public static final int icon=0x7f020002;
     }
     public static final class id {
-        public static final int LinearLayout01=0x7f050012;
-        public static final int TableLayout01=0x7f050000;
-        public static final int TableRow01=0x7f050010;
-        public static final int ViewStub01=0x7f050011;
-        public static final int button_start=0x7f050013;
-        public static final int label_num=0x7f05000b;
-        public static final int label_speed=0x7f05000e;
-        public static final int label_x=0x7f050002;
-        public static final int label_y=0x7f050005;
-        public static final int label_z=0x7f050008;
-        public static final int num=0x7f05000c;
-        public static final int row_num=0x7f05000a;
-        public static final int row_speed=0x7f05000d;
-        public static final int row_x=0x7f050001;
-        public static final int row_y=0x7f050004;
-        public static final int row_z=0x7f050007;
-        public static final int speed=0x7f05000f;
-        public static final int value_x=0x7f050003;
-        public static final int value_y=0x7f050006;
-        public static final int value_z=0x7f050009;
+        public static final int LinearLayout01=0x7f060015;
+        public static final int TableLayout01=0x7f060000;
+        public static final int TableRow01=0x7f060013;
+        public static final int TextOne=0x7f060001;
+        public static final int ViewStub01=0x7f060014;
+        public static final int button_one=0x7f06001a;
+        public static final int button_set_progress=0x7f060003;
+        public static final int button_start=0x7f060016;
+        public static final int button_two=0x7f06001b;
+        public static final int dayCounter=0x7f060018;
+        public static final int hmCounter=0x7f060017;
+        public static final int label_num=0x7f06000e;
+        public static final int label_speed=0x7f060011;
+        public static final int label_x=0x7f060005;
+        public static final int label_y=0x7f060008;
+        public static final int label_z=0x7f06000b;
+        public static final int num=0x7f06000f;
+        public static final int progress=0x7f060019;
+        public static final int row_num=0x7f06000d;
+        public static final int row_speed=0x7f060010;
+        public static final int row_x=0x7f060004;
+        public static final int row_y=0x7f060007;
+        public static final int row_z=0x7f06000a;
+        public static final int sCounter=0x7f06001c;
+        public static final int speed=0x7f060012;
+        public static final int txtFieldId=0x7f060002;
+        public static final int value_x=0x7f060006;
+        public static final int value_y=0x7f060009;
+        public static final int value_z=0x7f06000c;
     }
     public static final class layout {
-        public static final int main=0x7f030000;
+        public static final int configure=0x7f030000;
+        public static final int main=0x7f030001;
+        public static final int step_widget=0x7f030002;
+        public static final int widget=0x7f030003;
     }
     public static final class string {
-        public static final int app_name=0x7f040000;
+        public static final int X_axis_label=0x7f050007;
+        public static final int Y_axis_label=0x7f050006;
+        public static final int app_name=0x7f050000;
+        public static final int default_value=0x7f050003;
+        public static final int speed_label=0x7f050002;
+        public static final int start_button_text=0x7f050001;
+        public static final int steps_label=0x7f050004;
+        public static final int z_axis_label=0x7f050005;
+    }
+    public static final class xml {
+        public static final int step_widget_info=0x7f040000;
+        public static final int widget_info=0x7f040001;
     }
 }

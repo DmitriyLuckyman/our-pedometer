@@ -10,6 +10,8 @@ import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
+
+import java.util.Date;
 import java.util.List;
 
 public class AccelerometerService extends Service implements SensorEventListener {
@@ -71,7 +73,7 @@ public class AccelerometerService extends Service implements SensorEventListener
 
         @Override
         public int getSteps() throws RemoteException {
-            return new StatsCalculator(StatisticsManager.getInstance()).steps(null, null);
+            return new StatsCalculator(StatisticsManager.getInstance()).steps(new Date(0), new Date());
         }
     };
 }
