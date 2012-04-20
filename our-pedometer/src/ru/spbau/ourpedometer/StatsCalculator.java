@@ -18,13 +18,21 @@ public class StatsCalculator implements StatisticsCalculator {
 
     @Override
     public int steps(Date startTime, Date stopTime) {
-        List<StatisticsBean> statsList = (List<StatisticsBean>) reader.getStatsByDateRange(startTime, stopTime);
+        Iterable<StatisticsBean> statsList = reader.getStatsByDateRange(startTime, stopTime);
         int steps = 0;
 
-        long beginStepTime = statsList.get(0).time();
+        long beginStepTime = startTime.getTime();//statsList.get(0).time();
         boolean stepFlag = false;
+        boolean beginStepTimeInitialized = false; 
 
         for(StatisticsBean st : statsList){
+            if (!beginStepTimeInitialized)
+            {
+                beginStepTime = st.time();
+                beginStepTimeInitialized = true;
+            }
+            
+            
             if (Math.sqrt(Math.pow(st.x(), 2) + Math.pow(st.z(), 2) + Math.pow(st.z(), 2)) > stepHeightThreshold) {
                 if (!stepFlag) {
                     beginStepTime = st.time();
