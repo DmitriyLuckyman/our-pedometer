@@ -1,30 +1,23 @@
 package ru.spbau.ourpedometer;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
+import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.Environment;
+import android.os.IBinder;
+import android.os.RemoteException;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class MyActivity extends Activity implements SensorEventListener {
+public class MyActivity extends Activity {
     Button startButton;
-
-    SensorManager sensorManager;
-    Sensor accelerometerSensor;
 
     TextView valueX;
     TextView valueY;
@@ -33,49 +26,34 @@ public class MyActivity extends Activity implements SensorEventListener {
     TextView valueZ;
     TextView number;
     TextView speed;
+    PedometerRemoteInterface aService;
 
-    List<List<Float>> values;
-    boolean isRecording = false;
-
-    BufferedWriter writer;
-
-
-    ///todo: modify
-    double prevRes = 12;
-
-    int numberOfSteps = 0;
-
-    long timeOfStart;
-
-
+    private TimerTask timerTask;
     View.OnClickListener startListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            isRecording = !isRecording;
-            if (isRecording) {
-                values.clear();
+
+            if(!binded){
+                RemoteServiceConnection mConnection = new RemoteServiceConnection();
+                binded = bindService(new Intent(PedometerRemoteInterface.class.getName()),
+                                    mConnection, Context.BIND_AUTO_CREATE);
+            } else {
                 try {
-
-                    File file = new File(Environment.getExternalStorageDirectory() + File.separator + "test.txt");
-                    writer = new BufferedWriter(new FileWriter(file));
-
-                    writer.newLine();
-
-                    numberOfSteps = 0;
-                    number.setText("0");
-                    timeOfStart = System.currentTimeMillis();
-
-                } catch (IOException e) {
+                    number.setText(aService.getSteps());
+                } catch (RemoteException e) {
                     e.printStackTrace();
                 }
             }
         }
     };
+    private boolean binded;
+
 
     @Override
     protected void onResume() {
         super.onResume();
     }
+
 
     @Override
     protected void onPause() {
@@ -88,7 +66,6 @@ public class MyActivity extends Activity implements SensorEventListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        startService(new Intent(this, AccelerometerService.class));
         setContentView(R.layout.main);
 
         valueX = (TextView) findViewById(R.id.value_x);
@@ -101,67 +78,14 @@ public class MyActivity extends Activity implements SensorEventListener {
         startButton.setOnClickListener(startListener);
     }
 
+    class RemoteServiceConnection implements ServiceConnection {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            aService = PedometerRemoteInterface.Stub.asInterface(service);
+        }
 
-    @Override
-    public void onSensorChanged(SensorEvent sensorEvent) {
-        if(Sensor.TYPE_ACCELEROMETER == sensorEvent.sensor.getType()) {
-                if (!isRecording) return;
-                double result = 0;
-                final List<Float> lValues = new ArrayList<Float>();
-                try {
-                    writer.newLine();
-                } catch (IOException e) {
-                    System.err.println("Error during collecting statistics!");
-                    e.printStackTrace();
-                }
-                for (float value : sensorEvent.values) {
-                    lValues.add(value);
-                    result += Math.pow(value, 2);
-                    try {
-                        writer.write(String.valueOf(value) + " ");
-                    } catch (IOException e) {
-                        System.err.println("Error during collecting statistics!");
-                        e.printStackTrace();
-                    }
-                }
-
-                result = Math.sqrt(result);
-                //todo: magicNumber
-                if (getPrevRes() < 12 && result > 12) {
-                    numberOfSteps++;
-                    number.setText(String.valueOf(getNumberOfSteps()));
-                    speed.setText(String.valueOf(1000.0 * getNumberOfSteps() /
-                            (System.currentTimeMillis() - getTimeOfStart())));
-                }
-                prevRes = result;
-
-                try {
-                    writer.flush();
-                } catch (IOException e) {
-                    System.err.println("Error during saving statistics!");
-                    e.printStackTrace();
-                }
-                valueX.setText(String.valueOf(sensorEvent.values[SensorManager.DATA_X]));
-                valueY.setText(String.valueOf(sensorEvent.values[SensorManager.DATA_Y]));
-                valueZ.setText(String.valueOf(sensorEvent.values[SensorManager.DATA_Z]));
-                values.add(lValues);
+        public void onServiceDisconnected(ComponentName className) {
+            aService = null;
         }
     }
 
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int i) {
-    }
-
-    public double getPrevRes() {
-        return prevRes;
-    }
-
-
-    public long getTimeOfStart() {
-        return timeOfStart;
-    }
-
-    public int getNumberOfSteps() {
-        return numberOfSteps;
-    }
 }

@@ -1,7 +1,9 @@
 package ru.spbau.ourpedometer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 public class MemoryStatisticsCollector implements StatisticsCollector {
     final private ArrayList<StatisticsBean> data;
@@ -9,10 +11,14 @@ public class MemoryStatisticsCollector implements StatisticsCollector {
     public MemoryStatisticsCollector () {
         data = new ArrayList<StatisticsBean>();
     }
-    
+
     @Override
     public Iterable<StatisticsBean> getStatsByDateRange(Date startTime, Date stopTime) {
-        return data;
+        List<StatisticsBean> result = new ArrayList<StatisticsBean>();
+        synchronized (data){
+            Collections.copy(result, data);
+        }
+        return result;
     }
 
     @Override
