@@ -1,6 +1,5 @@
 package ru.spbau.ourpedometer;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -54,7 +53,7 @@ public class StatsCalculator implements StatisticsCalculator {
         stepWidthThreshold = threshold;
     }
 
-    private int convert(TimeUnit timeUnit){
+    private int currentTimeInMillis(TimeUnit timeUnit){
         switch (timeUnit){
             case MINUTES:
                 return  60*1000;
@@ -70,23 +69,23 @@ public class StatsCalculator implements StatisticsCalculator {
     @Override
     public float speed(Date startTime, Date stopTime, TimeUnit timeUnit) {
         int steps = steps(startTime, stopTime);
-        return steps/convert(timeUnit);
+        return steps/ currentTimeInMillis(timeUnit);
     }
 
     @Override
     public float minSpeed(Date startTime, Date stopTime, TimeUnit timeUnit) {
-        int conv = convert(timeUnit);
-        Long time = startTime.getTime() + conv;
+        int delta = currentTimeInMillis(timeUnit);
+        Long time = startTime.getTime() + delta;
         float min = speed(startTime, new Date(time), timeUnit);
 
 
-        while(time + conv <= stopTime.getTime()){
-            float speed = speed(new Date(time), new Date(time + conv), timeUnit);
+        while(time + delta <= stopTime.getTime()){
+            float speed = speed(new Date(time), new Date(time + delta), timeUnit);
             if(speed < min){
                 min = speed;
             }
 
-            time += conv;
+            time += delta;
         }
 
         return min;
@@ -94,18 +93,18 @@ public class StatsCalculator implements StatisticsCalculator {
 
     @Override
     public float maxSpeed(Date startTime, Date stopTime, TimeUnit timeUnit) {
-        int conv = convert(timeUnit);
-        Long time = startTime.getTime() + conv;
+        int delta = currentTimeInMillis(timeUnit);
+        Long time = startTime.getTime() + delta;
         float max = speed(startTime, new Date(time), timeUnit);
 
 
-        while(time + conv <= stopTime.getTime()){
-            float speed = speed(new Date(time), new Date(time + conv), timeUnit);
+        while(time + delta <= stopTime.getTime()){
+            float speed = speed(new Date(time), new Date(time + delta), timeUnit);
             if(speed > max){
                 max = speed;
             }
 
-            time += conv;
+            time += delta;
         }
 
         return max;
