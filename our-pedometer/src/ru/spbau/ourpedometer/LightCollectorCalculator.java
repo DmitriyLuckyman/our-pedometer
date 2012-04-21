@@ -4,8 +4,8 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public class LightCollectorCalculator implements StatisticsCollector, StatisticsCalculator {
-    private float stepHeightThreshold = 12;
-    private int stepWidthThreshold = 300;
+    private float stepHeightThreshold = 11;
+    private int stepWidthThreshold = 20;
 
     long beginStepTime;
     boolean stepFlag = false;
