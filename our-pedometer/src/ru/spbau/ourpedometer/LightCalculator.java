@@ -11,10 +11,10 @@ public class LightCalculator implements StatisticsCollector, StatisticsCalculato
     boolean stepFlag = false;
     boolean beginStepTimeInitialized = false;
 
-    StepsSaver keeper = new MemoryStepsSaver();
+    StepsSaver stepsSaver;
 
-    public LightCalculator() {
-
+    public LightCalculator(StepsSaver stepsSaver) {
+        this.stepsSaver = stepsSaver;
     }
 
     @Override
@@ -29,7 +29,7 @@ public class LightCalculator implements StatisticsCollector, StatisticsCalculato
 
     @Override
     public synchronized int steps(Date startTime, Date stopTime) {
-        return keeper.getStepsCount(startTime, stopTime);
+        return stepsSaver.getStepsCount(startTime, stopTime);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class LightCalculator implements StatisticsCollector, StatisticsCalculato
             if (stepFlag) {
                 if (st.time() - beginStepTime > stepWidthThreshold) {
                     //stepsCount++;
-                    keeper.addStep(new Date(st.time()));
+                    stepsSaver.addStep(new Date(st.time()));
                 }
                 stepFlag = false;
             }
@@ -119,6 +119,6 @@ public class LightCalculator implements StatisticsCollector, StatisticsCalculato
 
     @Override
     public void close() {
-        keeper.close();
+        stepsSaver.close();
     }
 }
