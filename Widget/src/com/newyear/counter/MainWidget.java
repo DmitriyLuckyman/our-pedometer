@@ -5,8 +5,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.CountDownTimer;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -18,6 +20,8 @@ public class MainWidget extends AppWidgetProvider{
     private static Context context_t;
     private static RemoteViews views;
     private static AppWidgetManager wm;
+    public static final String STEPS_BROADCAST_ACTION = "ru.spbau.ourpedometer.ACCELEROMETER_BROADCAST";
+
     private static int[] ids;
 
     public static String ACTION_WIDGET_CONFIGURE = "ConfigureWidget";
@@ -25,7 +29,7 @@ public class MainWidget extends AppWidgetProvider{
     private static int progress = 100;
     private static int maxProgress = 100;
     private RemoteViews views2;
-    private static int steps = 0;
+    private int steps = 0;
 
     public static void setProgress(int progress) {
         MainWidget.progress = progress;
@@ -33,9 +37,12 @@ public class MainWidget extends AppWidgetProvider{
         wm.updateAppWidget(ids, views);
     }
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-
-        /*IntentFilter filter = new IntentFilter();
-        context.registerReceiver(new Receiver(), filter);*/
+        context.getApplicationContext().registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                steps = intent.getIntExtra("steps", -1);
+            }
+        }, new IntentFilter(STEPS_BROADCAST_ACTION));
         context_t = context;
         views = new RemoteViews(context_t.getPackageName(), R.layout.step_widget);
         views2 = new RemoteViews(context_t.getPackageName(), R.layout.configure);
@@ -62,8 +69,8 @@ public class MainWidget extends AppWidgetProvider{
 
             public void onTick(long millisUntilFinished) { //выполняем регулярное действие
                 //меняем текст виджета
-                views.setProgressBar(R.id.progress, progress, steps++, false);
-                views.setTextViewText(R.id.dayCounter, "Number: " + daysLeft-- + "");
+                views.setProgressBar(R.id.progress, progress, steps, false);
+                views.setTextViewText(R.id.dayCounter, "Number: " + steps);
                 views.setTextViewText(R.id.hmCounter, "Speed: " + hoursLeft--);
                 wm.updateAppWidget(ids, views);
             }
