@@ -4,14 +4,12 @@ import android.app.Activity;
 import android.content.*;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import java.util.TimerTask;
 
-public class MyActivity extends Activity {
+public class StepsCountActivity extends Activity {
     Button startButton;
 
     TextView valueX;
@@ -23,37 +21,42 @@ public class MyActivity extends Activity {
     TextView speed;
     PedometerRemoteInterface aService;
 
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final int steps = intent.getIntExtra("steps", -1);
+            number.setText("" + steps);
+            Log.v(this.getClass().getName(), "Steps=" + steps);
+        }
+    };
+
+
+    private boolean buttonClicked;
+    private IntentFilter intentFilter = new IntentFilter(AccelerometerService.STEPS_BROADCAST_ACTION);
     View.OnClickListener startListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-
-            if(!binded){
-                RemoteServiceConnection mConnection = new RemoteServiceConnection();
-                binded = bindService(new Intent(PedometerRemoteInterface.class.getName()),
-                                    mConnection, Context.BIND_AUTO_CREATE);
-            } else {
-                try {
-                    final int steps = aService.getSteps();
-                    number.setText("" + steps);
-                    Log.v(this.getClass().getName(), "Steps=" + steps);
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-            }
+            registerReceiver(broadcastReceiver, intentFilter);
+            buttonClicked = true;
         }
     };
-    private boolean binded;
-
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        if(buttonClicked){
+            registerReceiver(broadcastReceiver, intentFilter);
+        }
     }
 
 
     @Override
     protected void onPause() {
         super.onPause();
+        if(buttonClicked){
+            unregisterReceiver(broadcastReceiver);
+        }
     }
 
     /**
@@ -62,7 +65,6 @@ public class MyActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        startService(new Intent(this, AccelerometerService.class));
         setContentView(R.layout.main);
 
         valueX = (TextView) findViewById(R.id.value_x);
