@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+        >
+
+    <TextView
+            android:id="@+id/hmCounter"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Speed: 0"
+            android:textColor="#000000"
+            android:textSize="20px"/>
+    <TextView
+            android:id="@+id/dayCounter"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Number: 0"
+            android:textColor="#000000"
+            android:textSize="20px"/>
+    <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:minWidth="50px"
+            android:max="100"
+            android:progress="12"
+            android:progressDrawable="@drawable/progress"
+            android:indeterminateOnly="false"
+            android:clickable="true"
+            android:layout_alignParentRight="true"/>
+</LinearLayout>
