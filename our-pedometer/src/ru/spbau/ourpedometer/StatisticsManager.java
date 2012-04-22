@@ -18,7 +18,7 @@ public class StatisticsManager {
     }
 
     public static StatsSaver getSaver() {
-        return saver;
+        return instance;
     }
 
 }
