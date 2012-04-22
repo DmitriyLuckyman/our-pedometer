@@ -8,4 +8,9 @@
     <string name="z.axis.label">Z:</string>
     <string name="Y.axis.label">Y:</string>
     <string name="X.axis.label">X:</string>
+
+    <string name="sensitivity.label">Sensitivity:</string>
+    <string name="rate.label">Update rate:</string>
+    <string name="save.button">Save</string>
+    <string name="cancel.button">Cancel</string>
 </resources>
