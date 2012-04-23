@@ -1,37 +1,33 @@
 /*
  * This file is auto-generated.  DO NOT MODIFY.
- * Original file: /home/maria/Dropbox/2semestr/PedometerWidget/src/com/newyear/counter/PedometerRemoteInterface.aidl
+ * Original file: /home/maria/Dropbox/2semestr/PedometerWidget/src/ru/spbau/pedometer/widget/PedometerRemoteInterface.aidl
  */
-package com.newyear.counter;
-/**
- * User: Dmitriy Bandurin
- * Date: 20.04.12
- */
+package ru.spbau.pedometer.widget;
 public interface PedometerRemoteInterface extends android.os.IInterface
 {
 /** Local-side IPC implementation stub class. */
-public static abstract class Stub extends android.os.Binder implements com.newyear.counter.PedometerRemoteInterface
+public static abstract class Stub extends android.os.Binder implements ru.spbau.pedometer.widget.PedometerRemoteInterface
 {
-private static final java.lang.String DESCRIPTOR = "com.newyear.counter.PedometerRemoteInterface";
+private static final java.lang.String DESCRIPTOR = "ru.spbau.pedometer.widget.PedometerRemoteInterface";
 /** Construct the stub at attach it to the interface. */
 public Stub()
 {
 this.attachInterface(this, DESCRIPTOR);
 }
 /**
- * Cast an IBinder object into an com.newyear.counter.PedometerRemoteInterface interface,
+ * Cast an IBinder object into an ru.spbau.pedometer.widget.PedometerRemoteInterface interface,
  * generating a proxy if needed.
  */
-public static com.newyear.counter.PedometerRemoteInterface asInterface(android.os.IBinder obj)
+public static ru.spbau.pedometer.widget.PedometerRemoteInterface asInterface(android.os.IBinder obj)
 {
 if ((obj==null)) {
 return null;
 }
 android.os.IInterface iin = (android.os.IInterface)obj.queryLocalInterface(DESCRIPTOR);
-if (((iin!=null)&&(iin instanceof com.newyear.counter.PedometerRemoteInterface))) {
-return ((com.newyear.counter.PedometerRemoteInterface)iin);
+if (((iin!=null)&&(iin instanceof ru.spbau.pedometer.widget.PedometerRemoteInterface))) {
+return ((ru.spbau.pedometer.widget.PedometerRemoteInterface)iin);
 }
-return new com.newyear.counter.PedometerRemoteInterface.Stub.Proxy(obj);
+return new ru.spbau.pedometer.widget.PedometerRemoteInterface.Stub.Proxy(obj);
 }
 public android.os.IBinder asBinder()
 {
@@ -57,7 +53,7 @@ return true;
 }
 return super.onTransact(code, data, reply, flags);
 }
-private static class Proxy implements com.newyear.counter.PedometerRemoteInterface
+private static class Proxy implements ru.spbau.pedometer.widget.PedometerRemoteInterface
 {
 private android.os.IBinder mRemote;
 Proxy(android.os.IBinder remote)
