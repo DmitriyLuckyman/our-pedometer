@@ -13,7 +13,6 @@ import ru.spbau.ourpedometer.PedometerRemoteInterface;
 import ru.spbau.ourpedometer.persistens.StatisticsBean;
 import ru.spbau.ourpedometer.persistens.StatisticsCalculator;
 import ru.spbau.ourpedometer.persistens.StatisticsManager;
-import ru.spbau.ourpedometer.persistens.StatsCalculator;
 import ru.spbau.ourpedometer.settingsactivity.StepsCountActivity;
 
 import java.sql.Time;
