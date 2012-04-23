@@ -12,7 +12,6 @@ import android.content.IntentFilter;
 import android.graphics.*;
 import android.util.Log;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
 public class MainWidget extends AppWidgetProvider {
     private static Context context_t;
@@ -67,9 +66,8 @@ public class MainWidget extends AppWidgetProvider {
             @Override
             public void onReceive(Context context, Intent intent) {
                 steps = intent.getIntExtra("steps", -1);
-                if (maxSteps <= steps) {
+                if(steps >= maxSteps) {
                     sendFinishNotification(context);
-                    steps -= maxSteps;
                 }
                 drawProgress();
             }
@@ -86,6 +84,7 @@ public class MainWidget extends AppWidgetProvider {
     }
 
     private void sendFinishNotification(Context context) {
+        if(maxSteps > steps) return;
         Intent active = new Intent(context, MainWidget.class);
         active.setAction(ACTION_WIDGET_RECEIVER);
         active.putExtra("msg", "You have walked " + maxSteps + "!\n " +
@@ -106,7 +105,7 @@ public class MainWidget extends AppWidgetProvider {
         final Canvas canvas = new Canvas(bitmap);
         canvas.drawColor(Color.argb(0, 0, 0, 0));
 
-        mSweep = (float) (steps * 360.0 / maxSteps);
+        mSweep = (float) ((steps % maxSteps) * 360.0 / maxSteps);
         if (mSweep > 360) {
             mSweep -= 360;
         }
@@ -135,7 +134,6 @@ public class MainWidget extends AppWidgetProvider {
                 } catch (NullPointerException e) {
                     Log.e("Error", "msg = null");
                 }
-                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
                 PendingIntent contentIntent = PendingIntent.getActivity(context, 0, intent, 0);
                 NotificationManager notificationManager =
                         (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -146,7 +144,7 @@ public class MainWidget extends AppWidgetProvider {
                         System.currentTimeMillis());
                 noty.flags = Notification.FLAG_ONGOING_EVENT;
                 noty.setLatestEventInfo(context, "Pedometer", msg, contentIntent);
-                notificationManager.notify(notyNumber++, noty);
+                notificationManager.notify(steps / maxSteps, noty);
             }
             super.onReceive(context, intent);
         }
@@ -166,8 +164,7 @@ public class MainWidget extends AppWidgetProvider {
         textPaint.setAntiAlias(true);
         textPaint.setColor(textColor);
         textPaint.setTextSize(30);
-        String progress = String.valueOf((int) Math.abs(steps * 100.0 / maxSteps)) + "%";
-        if (maxSteps < steps) progress = "100%";
+        String progress = String.valueOf((int) Math.abs((steps % maxSteps) * 100.0 / maxSteps)) + "%";
         canvas.drawText(progress, oval.centerX() - 10 * progress.length(), oval.centerY() + 10, textPaint);
 
         canvas.drawArc(oval, 0, 360, false, secondOval);
