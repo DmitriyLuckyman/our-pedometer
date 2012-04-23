@@ -1,4 +1,6 @@
-package ru.spbau.ourpedometer;
+package ru.spbau.ourpedometer.persistens;
+
+import ru.spbau.ourpedometer.persistens.StatisticsBean;
 
 import java.util.Date;
 

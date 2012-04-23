@@ -3,6 +3,8 @@ package ru.spbau.ourpedometer.settingsactivity;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
@@ -10,37 +12,32 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import ru.spbau.ourpedometer.AccelerometerService;
+import ru.spbau.ourpedometer.service.AccelerometerService;
 import ru.spbau.ourpedometer.R;
 
 import java.sql.Time;
 import java.util.Calendar;
 
 public class StepsCountActivity extends Activity {
-    private static float MIN_SENSITIVITY = 0.0f, MAX_SENSITIVITY = 1.0f;
-    private static float MIN_RATE = 0.5f, MAX_RATE = 10.0f;
 
-    private static final String PREFS_NAME = "OurPedometerPrefs";
-    private static final String SENSITIVITY_STRING = "sensitivity";
-    private static final String RATE_STRING = "rate";
+    public static final String PREFS_NAME = "OurPedometerPrefs";
+    public static final String SENSITIVITY_STRING = "sensitivity";
+    public static final String RATE_STRING = "rate";
+    public static final int DEFAULT_RATE_VALUE = 1;
+    public static final int DEFAULT_SENSITIVITY_VALUE = 40;
+    public static final String OURPEDOMETER_CONFIG_CHANGED = "ru.spbau.ourpedometer.CONFIG_CHANGED";
 
     private SharedPreferences settings;
 
-
-    private SeekBar sensitivityBar;
     private TextView sensitivityValueLabel;
-    private SeekBar rateBar;
     private TextView rateValueLabel;
 
-    private Button saveButton;
-    private Button cancelButton;
-
-    private SmartValue<Float> sensitivity;
-    private SmartValue<Float> rate;
-
+    private SmartValue<Integer> sensitivity;
+    private SmartValue<Integer> rate;
     private TextView mTimeDisplay;
     private Button mPickTime;
-
+    private Button saveButton;
+    
     private int mHour;
     private int mMinute;
 
@@ -59,28 +56,28 @@ public class StepsCountActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        settings = getSharedPreferences(PREFS_NAME, 0);
-        sensitivity = new SmartValue<Float>(settings.getFloat(SENSITIVITY_STRING, (MIN_SENSITIVITY + MAX_SENSITIVITY) * 0.5f));
-        rate = new SmartValue<Float>(settings.getFloat(RATE_STRING, (MIN_RATE + MAX_RATE) * 0.5f));
+        settings = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        sensitivity = new SmartValue<Integer>(settings.getInt(SENSITIVITY_STRING, DEFAULT_SENSITIVITY_VALUE));
+        rate = new SmartValue<Integer>(settings.getInt(RATE_STRING, DEFAULT_RATE_VALUE));
 
         setContentView(R.layout.main);
 
-        sensitivityBar = (SeekBar) findViewById(R.id.sensitivity_bar);
-        sensitivityBar.setOnSeekBarChangeListener(new SmartFloatSeekBarListener(sensitivityBar, sensitivity, 0.0f, 1.0f));
-        sensitivityValueLabel = (TextView) findViewById(R.id.sensitivity_value_label);
-        sensitivity.addListener(new SmartValueListener<Float>() {
+        SeekBar sensitivityBar = (SeekBar) findViewById(R.id.sensitivity_bar);
+        sensitivityBar.setOnSeekBarChangeListener(new SmartIntegerSeekBarListener(sensitivityBar, sensitivity));
+        sensitivityValueLabel = (TextView)findViewById(R.id.sensitivity_value_label);
+        sensitivity.addListener(new SmartValueListener<Integer>() {
             @Override
-            public void onValueChanged(Float value) {
+            public void onValueChanged(Integer value) {
                 sensitivityValueLabel.setText("" + sensitivity.getValue());
             }
         });
 
-        rateBar = (SeekBar) findViewById(R.id.rate_bar);
-        rateBar.setOnSeekBarChangeListener(new SmartFloatSeekBarListener(rateBar, rate, 0.5f, 15.0f));
-        rateValueLabel = (TextView) findViewById(R.id.rate_value_label);
-        rate.addListener(new SmartValueListener<Float>() {
+        SeekBar rateBar = (SeekBar) findViewById(R.id.rate_bar);
+        rateBar.setOnSeekBarChangeListener(new SmartIntegerSeekBarListener(rateBar, rate));
+        rateValueLabel = (TextView)findViewById(R.id.rate_value_label);
+        rate.addListener(new SmartValueListener<Integer>() {
             @Override
-            public void onValueChanged(Float value) {
+            public void onValueChanged(Integer value) {
                 rateValueLabel.setText("" + rate.getValue());
             }
         });
@@ -90,14 +87,19 @@ public class StepsCountActivity extends Activity {
             @Override
             public void onClick(View view) {
                 SharedPreferences.Editor editor = settings.edit();
-                editor.putFloat(SENSITIVITY_STRING, sensitivity.getValue());
-                editor.putFloat(RATE_STRING, rate.getValue());
+                final Integer sens = sensitivity.getValue();
+                editor.putInt(SENSITIVITY_STRING, sens);
+                final Integer rateValue = rate.getValue();
+                editor.putInt(RATE_STRING, rateValue);
                 editor.commit();
-
-                finish();
+                Intent configChangeIntent = new Intent(OURPEDOMETER_CONFIG_CHANGED);
+                configChangeIntent.putExtra(SENSITIVITY_STRING, sens);
+                configChangeIntent.putExtra(RATE_STRING, rateValue);
+                sendBroadcast(configChangeIntent);
             }
         });
-        cancelButton = (Button) findViewById(R.id.cancel_button);
+
+        Button cancelButton = (Button) findViewById(R.id.close_button);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

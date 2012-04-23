@@ -1,4 +1,4 @@
-package ru.spbau.ourpedometer;
+package ru.spbau.ourpedometer.persistens;
 
 import java.util.ArrayList;
 import java.util.Collections;

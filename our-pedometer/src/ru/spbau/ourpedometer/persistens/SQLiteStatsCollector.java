@@ -1,4 +1,4 @@
-package ru.spbau.ourpedometer;
+package ru.spbau.ourpedometer.persistens;
 
 import android.content.ContentValues;
 import android.database.Cursor;

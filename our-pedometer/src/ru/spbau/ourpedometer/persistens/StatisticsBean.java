@@ -1,4 +1,4 @@
-package ru.spbau.ourpedometer;
+package ru.spbau.ourpedometer.persistens;
 
 public class StatisticsBean {
     private Float[] coordinates;

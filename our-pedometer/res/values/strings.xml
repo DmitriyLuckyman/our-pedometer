@@ -12,5 +12,6 @@
     <string name="sensitivity.label">Sensitivity:</string>
     <string name="rate.label">Update rate:</string>
     <string name="save.button">Save</string>
-    <string name="cancel.button">Cancel</string>
+    <string name="close.button">Close</string>
+    <string name="zero.value">0</string>
 </resources>

@@ -1,4 +1,7 @@
-package ru.spbau.ourpedometer;
+package ru.spbau.ourpedometer.persistens;
+
+import ru.spbau.ourpedometer.persistens.StatisticsBean;
+import ru.spbau.ourpedometer.persistens.StatsSaver;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

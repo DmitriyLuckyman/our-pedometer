@@ -2,6 +2,7 @@ package ru.spbau.ourpedometer;
 
 import android.app.Application;
 import android.content.Intent;
+import ru.spbau.ourpedometer.service.AccelerometerService;
 
 /**
  * User: Dmitriy Bandurin

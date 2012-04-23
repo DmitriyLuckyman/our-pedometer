@@ -1,4 +1,4 @@
-package ru.spbau.ourpedometer;
+package ru.spbau.ourpedometer.persistens;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -62,6 +62,7 @@ public class LightCollectorCalculator implements StatisticsCollector, Statistics
             }
         }
     }
+
     private int currentTimeInMillis(TimeUnit timeUnit){
         switch (timeUnit){
             case MINUTES:

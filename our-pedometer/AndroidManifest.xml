@@ -24,7 +24,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:enabled="true" android:name=".AccelerometerService">
+        <service android:enabled="true" android:name=".service.AccelerometerService">
             <intent-filter>
                 <action android:name="ru.spbau.ourpedometer.PedometerRemoteInterface"/>
             </intent-filter>

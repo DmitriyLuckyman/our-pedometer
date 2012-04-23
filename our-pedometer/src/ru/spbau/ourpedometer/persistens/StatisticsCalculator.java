@@ -1,4 +1,4 @@
-package ru.spbau.ourpedometer;
+package ru.spbau.ourpedometer.persistens;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;

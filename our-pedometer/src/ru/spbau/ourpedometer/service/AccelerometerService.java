@@ -1,8 +1,7 @@
-package ru.spbau.ourpedometer;
+package ru.spbau.ourpedometer.service;
 
 import android.app.Service;
-import android.content.Context;
-import android.content.Intent;
+import android.content.*;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -10,6 +9,11 @@ import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
+import ru.spbau.ourpedometer.PedometerRemoteInterface;
+import ru.spbau.ourpedometer.persistens.StatisticsBean;
+import ru.spbau.ourpedometer.persistens.StatisticsManager;
+import ru.spbau.ourpedometer.persistens.StatsCalculator;
+import ru.spbau.ourpedometer.settingsactivity.StepsCountActivity;
 
 import java.sql.Time;
 import java.util.*;
@@ -25,10 +29,20 @@ public class AccelerometerService extends Service implements SensorEventListener
 
     private static Time timeSinceStart;
 
+    private BroadcastReceiver configChangeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            configureTimer(intent.getIntExtra(StepsCountActivity.RATE_STRING, INTERVAL));
+        }
+    };
+
+    private IntentFilter configChangeIntentFilter = new IntentFilter(StepsCountActivity.OURPEDOMETER_CONFIG_CHANGED);
+
     @Override
     public void onCreate() {
         super.onCreate();
         startService();
+        startDate();
         Log.v(this.getClass().getName(), "onCreate(..)");
     }
 
@@ -44,7 +58,31 @@ public class AccelerometerService extends Service implements SensorEventListener
         sensorManager.unregisterListener(this, accelerometerSensor);
     }
 
+    private void configureTimer(int interval) {
+
+        if(timer != null){
+            timer.cancel();
+        }
+
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    Intent intent = new Intent(STEPS_BROADCAST_ACTION);
+                    intent.putExtra("steps",
+                            StatisticsManager.getCalculator().steps(startDate(), new Date()));
+                    sendBroadcast(intent);
+                } catch (Exception ex) {
+                    Log.d(AccelerometerService.class.getName(), ex.getMessage());
+                }
+            }
+        }, FIRST_RUN, interval);
+
+    }
+
     private void startService() {
+
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         List<Sensor> sensors = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
         if (!sensors.isEmpty()) {
@@ -59,21 +97,10 @@ public class AccelerometerService extends Service implements SensorEventListener
                     break;
                 }
             }
-            timer = new Timer();
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    try {
-
-                        Intent intent = new Intent(STEPS_BROADCAST_ACTION);
-                        intent.putExtra("steps",
-                                StatisticsManager.getCalculator().steps(startDate(), new Date()));
-                        sendBroadcast(intent);
-                    } catch (Exception ex) {
-                        Log.d(AccelerometerService.class.getName(), ex.getMessage());
-                    }
-                }
-            }, FIRST_RUN, INTERVAL);
+            registerReceiver(configChangeReceiver, configChangeIntentFilter);
+            final SharedPreferences sharedPreferences = getSharedPreferences(StepsCountActivity.PREFS_NAME, MODE_PRIVATE);
+            final int interval = sharedPreferences.getInt(StepsCountActivity.SENSITIVITY_STRING, INTERVAL);
+            configureTimer(interval);
         }
     }
 
@@ -109,7 +136,7 @@ public class AccelerometerService extends Service implements SensorEventListener
 
     public static Date startDate() {
         Calendar cal = Calendar.getInstance();
-        if(timeSinceStart == null) {
+        if (timeSinceStart == null) {
             cal.set(Calendar.HOUR_OF_DAY, 0);
             cal.set(Calendar.MINUTE, 0);
             cal.set(Calendar.SECOND, 0);
