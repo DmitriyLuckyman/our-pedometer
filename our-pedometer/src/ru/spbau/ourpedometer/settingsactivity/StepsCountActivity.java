@@ -59,6 +59,8 @@ public class StepsCountActivity extends Activity {
         settings = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         sensitivity = new SmartValue<Integer>(settings.getInt(SENSITIVITY_STRING, DEFAULT_SENSITIVITY_VALUE));
         rate = new SmartValue<Integer>(settings.getInt(RATE_STRING, DEFAULT_RATE_VALUE));
+        //sensitivity = new SmartValue<Integer>(DEFAULT_SENSITIVITY_VALUE);
+        //rate = new SmartValue<Integer>(DEFAULT_RATE_VALUE);
 
         setContentView(R.layout.main);
 
