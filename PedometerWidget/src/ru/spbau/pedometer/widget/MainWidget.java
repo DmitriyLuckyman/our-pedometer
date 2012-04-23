@@ -27,6 +27,7 @@ public class MainWidget extends AppWidgetProvider {
     private static Paint mPaints;
     private static RectF mBigOval;
     private static float mSweep;
+    private static int notyNumber = 1;
 
     public static String ACTION_WIDGET_CONFIGURE = "ConfigureWidget";
     public static String ACTION_WIDGET_RECEIVER = "ActionReceiverWidget";
@@ -66,6 +67,10 @@ public class MainWidget extends AppWidgetProvider {
             @Override
             public void onReceive(Context context, Intent intent) {
                 steps = intent.getIntExtra("steps", -1);
+                if (maxSteps <= steps) {
+                    sendFinishNotification(context);
+                    steps -= maxSteps;
+                }
                 drawProgress();
             }
         }, new IntentFilter(STEPS_BROADCAST_ACTION));
@@ -78,30 +83,19 @@ public class MainWidget extends AppWidgetProvider {
         configIntent.setAction(ACTION_WIDGET_CONFIGURE);
         configPendingIntent = PendingIntent.getActivity(context, 0, configIntent, 0);
 
+    }
 
-
+    private void sendFinishNotification(Context context) {
         Intent active = new Intent(context, MainWidget.class);
         active.setAction(ACTION_WIDGET_RECEIVER);
-        active.putExtra("msg", "Pedometer has started");
+        active.putExtra("msg", "You have walked " + maxSteps + "!\n " +
+                "Pedometer has started from the beginning");
         PendingIntent actionPendingIntent = PendingIntent.getBroadcast(context, 0, active, 0);
         try {
             actionPendingIntent.send();
         } catch (PendingIntent.CanceledException e) {
             e.printStackTrace();
         }
-/*
-        CountDownTimer timer = new CountDownTimer(100000, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                steps;
-                drawProgress();
-            }
-
-            @Override
-            public void onFinish() {
-            }
-        }.start();
-*/
     }
 
     private static void drawProgress() {
@@ -145,20 +139,14 @@ public class MainWidget extends AppWidgetProvider {
                 PendingIntent contentIntent = PendingIntent.getActivity(context, 0, intent, 0);
                 NotificationManager notificationManager =
                         (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                /*                Notification.Builder builder = new Notification.Builder(context);
-                builder.setOngoing(true);
-                builder.setContentTitle("Pedometer");
-                builder.setContentText("Pedometer has started!");
-                builder.setSmallIcon(R.drawable.icon);
-                builder.setSmallIcon(R.drawable.icon);
-                builder.setWhen(System.currentTimeMillis());
-                builder.setContentIntent(contentIntent);
-                notificationManager.notify(1, builder.getNotification());*/
-                Notification noty = new Notification(R.drawable.icon, "Pedometer has started!",
+
+                //Notification has been deprecated only since 3.0.
+                Notification noty = new Notification(R.drawable.icon, "You have walked " + maxSteps + "!\n " +
+                        "Pedometer has started from the beginning",
                         System.currentTimeMillis());
                 noty.flags = Notification.FLAG_ONGOING_EVENT;
-                noty.setLatestEventInfo(context, "Notice", msg, contentIntent);
-                notificationManager.notify(1, noty);
+                noty.setLatestEventInfo(context, "Pedometer", msg, contentIntent);
+                notificationManager.notify(notyNumber++, noty);
             }
             super.onReceive(context, intent);
         }
@@ -178,8 +166,8 @@ public class MainWidget extends AppWidgetProvider {
         textPaint.setAntiAlias(true);
         textPaint.setColor(textColor);
         textPaint.setTextSize(30);
-        String progress = String.valueOf((int)Math.abs(steps * 100.0 / maxSteps)) + "%";
-        if(maxSteps < steps) progress = "100%";
+        String progress = String.valueOf((int) Math.abs(steps * 100.0 / maxSteps)) + "%";
+        if (maxSteps < steps) progress = "100%";
         canvas.drawText(progress, oval.centerX() - 10 * progress.length(), oval.centerY() + 10, textPaint);
 
         canvas.drawArc(oval, 0, 360, false, secondOval);
