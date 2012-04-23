@@ -26,7 +26,6 @@ public class MainWidget extends AppWidgetProvider {
     private static Paint mPaints;
     private static RectF mBigOval;
     private static float mSweep;
-    private static int notyNumber = 1;
 
     public static String ACTION_WIDGET_CONFIGURE = "ConfigureWidget";
     public static String ACTION_WIDGET_RECEIVER = "ActionReceiverWidget";
@@ -37,6 +36,7 @@ public class MainWidget extends AppWidgetProvider {
 
 
     public static void setMaxSteps(int max) {
+        if(max == 0) return;
         MainWidget.maxSteps = max;
         drawProgress();
     }
@@ -87,7 +87,8 @@ public class MainWidget extends AppWidgetProvider {
         if(maxSteps > steps) return;
         Intent active = new Intent(context, MainWidget.class);
         active.setAction(ACTION_WIDGET_RECEIVER);
-        active.putExtra("msg", "You have walked " + maxSteps + "!\n " +
+        active.putExtra("msg", "You have walked " + maxSteps + " " +
+                steps/maxSteps + " times!\n " +
                 "Pedometer has started from the beginning");
         PendingIntent actionPendingIntent = PendingIntent.getBroadcast(context, 0, active, 0);
         try {
@@ -139,12 +140,13 @@ public class MainWidget extends AppWidgetProvider {
                         (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
                 //Notification has been deprecated only since 3.0.
-                Notification noty = new Notification(R.drawable.icon, "You have walked " + maxSteps + "!\n " +
+                Notification noty = new Notification(R.drawable.icon, "You have walked " + maxSteps + " " +
+                        steps/maxSteps + " times!\n " +
                         "Pedometer has started from the beginning",
                         System.currentTimeMillis());
                 noty.flags = Notification.FLAG_ONGOING_EVENT;
                 noty.setLatestEventInfo(context, "Pedometer", msg, contentIntent);
-                notificationManager.notify(steps / maxSteps, noty);
+                notificationManager.notify(1, noty);
             }
             super.onReceive(context, intent);
         }
