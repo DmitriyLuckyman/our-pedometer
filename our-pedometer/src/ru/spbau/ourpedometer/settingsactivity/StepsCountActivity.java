@@ -22,17 +22,21 @@ public class StepsCountActivity extends Activity {
 
     public static final String PREFS_NAME = "OurPedometerPrefs";
     public static final String SENSITIVITY_STRING = "sensitivity";
+    public static final String V_SENSITIVITY_STRING = "sensitivity";
     public static final String RATE_STRING = "rate";
     public static final int DEFAULT_RATE_VALUE = 1;
     public static final int DEFAULT_SENSITIVITY_VALUE = 40;
+    public static final int DEFAULT_V_SENSITIVITY_VALUE = 2;
     public static final String OURPEDOMETER_CONFIG_CHANGED = "ru.spbau.ourpedometer.CONFIG_CHANGED";
 
     private SharedPreferences settings;
 
     private TextView sensitivityValueLabel;
+    private TextView v_sensitivityValueLabel;
     private TextView rateValueLabel;
 
     private SmartValue<Integer> sensitivity;
+    private SmartValue<Integer> v_sensitivity;
     private SmartValue<Integer> rate;
     private TextView mTimeDisplay;
     private Button mPickTime;
@@ -58,6 +62,7 @@ public class StepsCountActivity extends Activity {
 
         settings = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         sensitivity = new SmartValue<Integer>(settings.getInt(SENSITIVITY_STRING, DEFAULT_SENSITIVITY_VALUE));
+        v_sensitivity = new SmartValue<Integer>(settings.getInt(V_SENSITIVITY_STRING, DEFAULT_V_SENSITIVITY_VALUE));
         rate = new SmartValue<Integer>(settings.getInt(RATE_STRING, DEFAULT_RATE_VALUE));
         //sensitivity = new SmartValue<Integer>(DEFAULT_SENSITIVITY_VALUE);
         //rate = new SmartValue<Integer>(DEFAULT_RATE_VALUE);
@@ -71,6 +76,16 @@ public class StepsCountActivity extends Activity {
             @Override
             public void onValueChanged(Integer value) {
                 sensitivityValueLabel.setText("" + sensitivity.getValue());
+            }
+        });
+
+        SeekBar v_sensitivityBar = (SeekBar) findViewById(R.id.v_sensitivity_bar);
+        v_sensitivityBar.setOnSeekBarChangeListener(new SmartIntegerSeekBarListener(v_sensitivityBar, v_sensitivity));
+        v_sensitivityValueLabel = (TextView)findViewById(R.id.v_sensitivity_value_label);
+        v_sensitivity.addListener(new SmartValueListener<Integer>() {
+            @Override
+            public void onValueChanged(Integer value) {
+                v_sensitivityValueLabel.setText("" + value);
             }
         });
 
@@ -91,11 +106,14 @@ public class StepsCountActivity extends Activity {
                 SharedPreferences.Editor editor = settings.edit();
                 final Integer sens = sensitivity.getValue();
                 editor.putInt(SENSITIVITY_STRING, sens);
+                final Integer v_sens = v_sensitivity.getValue();
+                editor.putInt(V_SENSITIVITY_STRING, v_sens);
                 final Integer rateValue = rate.getValue();
                 editor.putInt(RATE_STRING, rateValue);
                 editor.commit();
                 Intent configChangeIntent = new Intent(OURPEDOMETER_CONFIG_CHANGED);
                 configChangeIntent.putExtra(SENSITIVITY_STRING, sens);
+                configChangeIntent.putExtra(V_SENSITIVITY_STRING, v_sens);
                 configChangeIntent.putExtra(RATE_STRING, rateValue);
                 sendBroadcast(configChangeIntent);
             }
