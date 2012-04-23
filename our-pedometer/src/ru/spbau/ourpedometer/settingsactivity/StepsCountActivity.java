@@ -26,7 +26,7 @@ public class StepsCountActivity extends Activity {
 
     private SharedPreferences settings;
 
-    
+
     private SeekBar sensitivityBar;
     private TextView sensitivityValueLabel;
     private SeekBar rateBar;
@@ -65,9 +65,9 @@ public class StepsCountActivity extends Activity {
 
         setContentView(R.layout.main);
 
-        sensitivityBar = (SeekBar)findViewById(R.id.sensitivity_bar);
+        sensitivityBar = (SeekBar) findViewById(R.id.sensitivity_bar);
         sensitivityBar.setOnSeekBarChangeListener(new SmartFloatSeekBarListener(sensitivityBar, sensitivity, 0.0f, 1.0f));
-        sensitivityValueLabel = (TextView)findViewById(R.id.sensitivity_value_label);
+        sensitivityValueLabel = (TextView) findViewById(R.id.sensitivity_value_label);
         sensitivity.addListener(new SmartValueListener<Float>() {
             @Override
             public void onValueChanged(Float value) {
@@ -75,9 +75,9 @@ public class StepsCountActivity extends Activity {
             }
         });
 
-        rateBar = (SeekBar)findViewById(R.id.rate_bar);
+        rateBar = (SeekBar) findViewById(R.id.rate_bar);
         rateBar.setOnSeekBarChangeListener(new SmartFloatSeekBarListener(rateBar, rate, 0.5f, 15.0f));
-        rateValueLabel = (TextView)findViewById(R.id.rate_value_label);
+        rateValueLabel = (TextView) findViewById(R.id.rate_value_label);
         rate.addListener(new SmartValueListener<Float>() {
             @Override
             public void onValueChanged(Float value) {
@@ -85,7 +85,7 @@ public class StepsCountActivity extends Activity {
             }
         });
 
-        saveButton = (Button)findViewById(R.id.save_button);
+        saveButton = (Button) findViewById(R.id.save_button);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -97,7 +97,7 @@ public class StepsCountActivity extends Activity {
                 finish();
             }
         });
-        cancelButton = (Button)findViewById(R.id.cancel_button);
+        cancelButton = (Button) findViewById(R.id.cancel_button);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -105,13 +105,17 @@ public class StepsCountActivity extends Activity {
             }
         });
         mTimeDisplay = (TextView) findViewById(R.id.timeDisplay);
+
         mPickTime = (Button) findViewById(R.id.pickTime);
         mPickTime.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 showDialog(TIME_DIALOG_ID);
             }
         });
+
         final Calendar c = Calendar.getInstance();
+        if (AccelerometerService.getTimeSinceStart() != null)
+            c.setTime(AccelerometerService.getTimeSinceStart());
         mHour = c.get(Calendar.HOUR_OF_DAY);
         mMinute = c.get(Calendar.MINUTE);
         updateTime();
