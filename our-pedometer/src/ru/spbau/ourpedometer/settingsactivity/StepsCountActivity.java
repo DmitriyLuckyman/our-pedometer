@@ -39,9 +39,7 @@ public class StepsCountActivity extends Activity {
     private SmartValue<Integer> v_sensitivity;
     private SmartValue<Integer> rate;
     private TextView mTimeDisplay;
-    private Button mPickTime;
-    private Button saveButton;
-    
+
     private int mHour;
     private int mMinute;
 
@@ -64,8 +62,6 @@ public class StepsCountActivity extends Activity {
         sensitivity = new SmartValue<Integer>(settings.getInt(SENSITIVITY_STRING, DEFAULT_SENSITIVITY_VALUE));
         v_sensitivity = new SmartValue<Integer>(settings.getInt(V_SENSITIVITY_STRING, DEFAULT_V_SENSITIVITY_VALUE));
         rate = new SmartValue<Integer>(settings.getInt(RATE_STRING, DEFAULT_RATE_VALUE));
-        //sensitivity = new SmartValue<Integer>(DEFAULT_SENSITIVITY_VALUE);
-        //rate = new SmartValue<Integer>(DEFAULT_RATE_VALUE);
 
         setContentView(R.layout.main);
 
@@ -99,7 +95,7 @@ public class StepsCountActivity extends Activity {
             }
         });
 
-        saveButton = (Button) findViewById(R.id.save_button);
+        Button saveButton = (Button) findViewById(R.id.save_button);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -128,7 +124,7 @@ public class StepsCountActivity extends Activity {
         });
         mTimeDisplay = (TextView) findViewById(R.id.timeDisplay);
 
-        mPickTime = (Button) findViewById(R.id.pickTime);
+        Button mPickTime = (Button) findViewById(R.id.pickTime);
         mPickTime.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 showDialog(TIME_DIALOG_ID);

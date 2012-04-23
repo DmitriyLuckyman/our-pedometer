@@ -6,5 +6,6 @@ package ru.spbau.ourpedometer;
 interface PedometerRemoteInterface {
 
     int getSteps();
+    float getSpeed();
 
 }

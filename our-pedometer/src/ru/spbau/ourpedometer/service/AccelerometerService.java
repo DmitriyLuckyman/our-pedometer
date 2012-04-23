@@ -133,8 +133,14 @@ public class AccelerometerService extends Service implements SensorEventListener
 
         @Override
         public int getSteps() throws RemoteException {
-            return new StatsCalculator(StatisticsManager.getReader()).steps(new Date(0), new Date());
+            return StatisticsManager.getCalculator().steps(startDate(), new Date());
         }
+
+        @Override
+        public float getSpeed() throws RemoteException {
+            return StatisticsManager.getCalculator().speed(startDate(), new Date(), TimeUnit.SECONDS);
+        }
+
     };
 
     public static void setTimeSinceStart(Time timeSinceStart) {
