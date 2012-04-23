@@ -6,9 +6,13 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.AudioManager;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.speech.tts.TextToSpeech;
+import android.text.Editable;
 import android.util.Log;
+import android.widget.EditText;
 import ru.spbau.ourpedometer.PedometerRemoteInterface;
 import ru.spbau.ourpedometer.persistens.StatisticsBean;
 import ru.spbau.ourpedometer.persistens.StatisticsCalculator;
@@ -19,11 +23,10 @@ import java.sql.Time;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class AccelerometerService extends Service implements SensorEventListener {
+public class AccelerometerService extends Service implements SensorEventListener, TextToSpeech.OnInitListener {
 
     public static final int FIRST_RUN = 2000;
     public static final int INTERVAL = 5000;
-    public static final String STEPS_BROADCAST_ACTION = "ru.spbau.ourpedometer.ACCELEROMETER_BROADCAST";
     public static final String STEPS_KEY = "steps";
     public static final String SPEED_KEY = "speed";
     private SensorManager sensorManager;
@@ -31,6 +34,106 @@ public class AccelerometerService extends Service implements SensorEventListener
     private Timer timer;
 
     private static Time timeSinceStart;
+
+        private int MY_DATA_CHECK_CODE = 0;
+        private TextToSpeech tts = null;
+        HashMap<String, String> hashAlarm = null;
+
+        private float maxSpeed = 4;
+        private float minSpeed = 1;
+        private int stepsCount = 900;
+        private long totalTime = 5 * 60 * 1000;
+        private long deltaSayTime = 20 * 1000;
+
+        private boolean init = false;
+        public static final String STEPS_BROADCAST_ACTION = "ru.spbau.ourpedometer.ACCELEROMETER_BROADCAST";
+        private boolean isBroadCastRegister = false;
+
+        private int delta = 0;
+        private int remSteps = stepsCount;
+        private long lastSayTime = 0;
+        private long startTime;
+        private double speed = 0;
+
+        private boolean isShouldSay = false;
+
+        private float getValue(EditText editText) {
+            Editable text = null;
+            if (editText != null) {
+                text = editText.getText();
+            }
+            if (text != null) {
+                return Float.valueOf(text.toString());
+            }
+            return -1;
+        }
+
+        @Override
+        public void onInit(int status) {
+            if (status == TextToSpeech.SUCCESS) {
+
+                int result = tts.setLanguage(Locale.US);
+                if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+
+                    Intent installIntent = new Intent();
+                    installIntent.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+                    startService(installIntent);
+                } else {
+                }
+
+            } else if (status == TextToSpeech.ERROR) {
+            }
+        }
+
+
+        private void start() {
+            isShouldSay = true;
+
+            if (tts == null) {
+            } else {
+
+                tts.speak("Let`s go!", TextToSpeech.QUEUE_FLUSH, hashAlarm);
+
+                lastSayTime = Calendar.getInstance().getTimeInMillis();
+                startTime = lastSayTime;
+
+                if (!isBroadCastRegister) {
+
+                    registerReceiver(new BroadcastReceiver() {
+                        @Override
+                        public void onReceive(Context context, Intent intent) {
+                            if (Calendar.getInstance().getTimeInMillis() - lastSayTime >= deltaSayTime && isShouldSay) {
+                                delta = intent.getIntExtra("steps", -1);
+                                double newSpeed = intent.getIntExtra("speed", -1);
+                                if (Math.abs(newSpeed - speed) > 1) {
+                                    tts.speak("Your speed has become greater on "+(newSpeed - speed),
+                                            TextToSpeech.QUEUE_FLUSH, hashAlarm);
+                                    speed = newSpeed;
+                                }
+                                remSteps = stepsCount - delta;
+                                if (remSteps < 0) {
+                                    remSteps = 0;
+                                    isShouldSay = false;
+                                }
+                                tts.speak("Remaining " + remSteps + " steps!", TextToSpeech.QUEUE_FLUSH, hashAlarm);
+                                try {
+                                    Thread.sleep(5000);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+
+                                lastSayTime += deltaSayTime;
+
+                            }
+                            if (Calendar.getInstance().getTimeInMillis() - startTime >= totalTime) {
+                                isShouldSay = false;
+                            }
+                        }
+                    }, new IntentFilter(STEPS_BROADCAST_ACTION));
+                }
+            }
+        }
+
 
     private BroadcastReceiver configChangeReceiver = new BroadcastReceiver() {
         @Override
@@ -50,6 +153,13 @@ public class AccelerometerService extends Service implements SensorEventListener
         startService();
         startDate();
         Log.v(this.getClass().getName(), "onCreate(..)");
+        tts = new TextToSpeech(this, this);
+
+        hashAlarm = new HashMap();
+        hashAlarm.put(TextToSpeech.Engine.KEY_PARAM_STREAM,
+                String.valueOf(AudioManager.STREAM_MUSIC));
+
+        start();
     }
 
     @Override
@@ -62,6 +172,12 @@ public class AccelerometerService extends Service implements SensorEventListener
     public void onDestroy() {
         timer.cancel();
         sensorManager.unregisterListener(this, accelerometerSensor);
+        if (tts != null) {
+            tts.stop();
+            tts.shutdown();
+        }
+
+
     }
 
     private void configureTimer(int interval) {
