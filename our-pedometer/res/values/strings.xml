@@ -10,6 +10,7 @@
     <string name="X.axis.label">X:</string>
 
     <string name="sensitivity.label">Sensitivity:</string>
+    <string name="v_sensitivity.label">Vertical Sensitivity:</string>
     <string name="rate.label">Update rate:</string>
     <string name="save.button">Save</string>
     <string name="close.button">Close</string>
