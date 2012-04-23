@@ -8,10 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-import android.widget.SeekBar;
-import android.widget.TextView;
-import android.widget.TimePicker;
+import android.widget.*;
 import ru.spbau.ourpedometer.service.AccelerometerService;
 import ru.spbau.ourpedometer.R;
 
@@ -22,11 +19,15 @@ public class StepsCountActivity extends Activity {
 
     public static final String PREFS_NAME = "OurPedometerPrefs";
     public static final String SENSITIVITY_STRING = "sensitivity";
-    public static final String V_SENSITIVITY_STRING = "sensitivity";
+    public static final String V_SENSITIVITY_STRING = "v_sensitivity";
     public static final String RATE_STRING = "rate";
+    public static final String AUTORUN_STRING = "autorun";
+
     public static final int DEFAULT_RATE_VALUE = 1;
     public static final int DEFAULT_SENSITIVITY_VALUE = 40;
     public static final int DEFAULT_V_SENSITIVITY_VALUE = 2;
+    public static final boolean DEFAULT_AUTORUN_VALUE = false;
+
     public static final String OURPEDOMETER_CONFIG_CHANGED = "ru.spbau.ourpedometer.CONFIG_CHANGED";
 
     private SharedPreferences settings;
@@ -38,6 +39,7 @@ public class StepsCountActivity extends Activity {
     private SmartValue<Integer> sensitivity;
     private SmartValue<Integer> v_sensitivity;
     private SmartValue<Integer> rate;
+    private boolean autorun;
     private TextView mTimeDisplay;
 
     private int mHour;
@@ -62,6 +64,7 @@ public class StepsCountActivity extends Activity {
         sensitivity = new SmartValue<Integer>(settings.getInt(SENSITIVITY_STRING, DEFAULT_SENSITIVITY_VALUE));
         v_sensitivity = new SmartValue<Integer>(settings.getInt(V_SENSITIVITY_STRING, DEFAULT_V_SENSITIVITY_VALUE));
         rate = new SmartValue<Integer>(settings.getInt(RATE_STRING, DEFAULT_RATE_VALUE));
+        autorun = settings.getBoolean(AUTORUN_STRING, DEFAULT_AUTORUN_VALUE);
 
         setContentView(R.layout.main);
 
@@ -95,6 +98,15 @@ public class StepsCountActivity extends Activity {
             }
         });
 
+        CheckBox autorunCheckBox = (CheckBox)findViewById(R.id.autorun_check_box);
+        autorunCheckBox.setChecked(autorun);
+        autorunCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                autorun = b;
+            }
+        });
+
         Button saveButton = (Button) findViewById(R.id.save_button);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,7 +118,9 @@ public class StepsCountActivity extends Activity {
                 editor.putInt(V_SENSITIVITY_STRING, v_sens);
                 final Integer rateValue = rate.getValue();
                 editor.putInt(RATE_STRING, rateValue);
+                editor.putBoolean(AUTORUN_STRING, autorun);
                 editor.commit();
+
                 Intent configChangeIntent = new Intent(OURPEDOMETER_CONFIG_CHANGED);
                 configChangeIntent.putExtra(SENSITIVITY_STRING, sens);
                 configChangeIntent.putExtra(V_SENSITIVITY_STRING, v_sens);
