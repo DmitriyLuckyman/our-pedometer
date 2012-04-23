@@ -79,7 +79,7 @@ public class LightCollectorCalculator implements StatisticsCollector, Statistics
     @Override
     public float speed(Date startTime, Date stopTime, TimeUnit timeUnit) {
         int steps = steps(startTime, stopTime);
-        return steps/ currentTimeInMillis(timeUnit);
+        return (float)steps/ (float)currentTimeInMillis(timeUnit);
     }
 
     public float minSpeed(Date startTime, Date stopTime, TimeUnit timeUnit) {
