@@ -18,12 +18,15 @@ import ru.spbau.ourpedometer.settingsactivity.StepsCountActivity;
 
 import java.sql.Time;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class AccelerometerService extends Service implements SensorEventListener {
 
     public static final int FIRST_RUN = 2000;
     public static final int INTERVAL = 5000;
     public static final String STEPS_BROADCAST_ACTION = "ru.spbau.ourpedometer.ACCELEROMETER_BROADCAST";
+    public static final String STEPS_KEY = "steps";
+    public static final String SPEED_KEY = "speed";
     private SensorManager sensorManager;
     private Sensor accelerometerSensor;
     private Timer timer;
@@ -74,8 +77,12 @@ public class AccelerometerService extends Service implements SensorEventListener
             public void run() {
                 try {
                     Intent intent = new Intent(STEPS_BROADCAST_ACTION);
-                    intent.putExtra("steps",
-                            StatisticsManager.getCalculator().steps(startDate(), new Date()));
+                    final StatisticsCalculator calculator = StatisticsManager.getCalculator();
+                    final Date startTime = startDate();
+                    final Date stopTime = new Date();
+                    intent.putExtra(STEPS_KEY,
+                            calculator.steps(startTime, stopTime));
+                    intent.putExtra(SPEED_KEY, calculator.speed(startTime, stopTime, TimeUnit.SECONDS));
                     sendBroadcast(intent);
                 } catch (Exception ex) {
                     Log.d(AccelerometerService.class.getName(), ex.getMessage());
