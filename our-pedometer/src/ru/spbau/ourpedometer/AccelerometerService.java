@@ -103,6 +103,10 @@ public class AccelerometerService extends Service implements SensorEventListener
         AccelerometerService.timeSinceStart = timeSinceStart;
     }
 
+    public static Time getTimeSinceStart() {
+        return timeSinceStart;
+    }
+
     public static Date startDate() {
         Calendar cal = Calendar.getInstance();
         if(timeSinceStart == null) {
