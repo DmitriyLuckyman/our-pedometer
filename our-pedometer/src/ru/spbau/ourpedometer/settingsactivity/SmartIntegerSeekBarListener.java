@@ -13,7 +13,9 @@ public class SmartIntegerSeekBarListener implements SmartValueListener<Integer>,
     }
 
     @Override
-    public void onValueChanged(Integer value) {}
+    public void onValueChanged(Integer value) {
+        bar.setProgress(value);
+    }
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int value, boolean isUserInteractive) {
