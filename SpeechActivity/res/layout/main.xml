@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:layout_gravity="center_horizontal|center"
+              android:background="@drawable/background">
+
+    <TableRow android:id="@+id/maxRow" 	
+              android:layout_width="fill_parent" 
+	          android:layout_height="wrap_content"
+	          android:layout_margin="5dip">
+
+       <TextView android:id="@+id/maxSpeedText" 
+                 android:layout_width="100dip" 
+                 android:layout_height="wrap_content"
+                 android:text="Max Speed: "
+                 android:textColor="@android:color/black"/>
+
+       <EditText android:id="@+id/maxSpeedValue"
+                 android:layout_width="100dip"
+                 android:layout_height="wrap_content"
+                 android:text="4"
+                 android:textColor="@android:color/black"/>
+
+       <TextView android:layout_width="wrap_content" 
+                 android:layout_height="wrap_content"
+                 android:text=" steps / sec "
+                 android:textColor="@android:color/black"/>
+
+    </TableRow>
+
+    <TableRow android:id="@+id/minRow"
+              android:layout_width="fill_parent"
+	      android:layout_height="wrap_content"
+	      android:layout_margin="5dip">
+
+       <TextView android:id="@+id/minSpeedTest"
+                 android:layout_width="100dip"
+                 android:layout_height="wrap_content"
+                 android:text="Min Speed: "
+                 android:textColor="@android:color/black"/>
+
+       <EditText android:id="@+id/minSpeedValue"
+                 android:layout_width="100dip"
+                 android:layout_height="wrap_content"
+                 android:text="1"
+                 android:textColor="@android:color/black"/>
+
+       <TextView android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text=" steps / sec "
+                 android:textColor="@android:color/black"/>
+
+    </TableRow>
+
+    <TableRow android:id="@+id/stepsRow"
+              android:layout_width="fill_parent"
+	      android:layout_height="wrap_content"
+	      android:layout_margin="5dip">
+
+       <TextView android:id="@+id/stepsText"
+                 android:layout_width="100dip"
+                 android:layout_height="wrap_content"
+                 android:text="Steps Count: "
+                 android:textColor="@android:color/black"/>
+
+       <EditText android:id="@+id/stepsValue"
+                 android:layout_width="100dip"
+                 android:layout_height="wrap_content"
+                 android:text="900"
+                 android:textColor="@android:color/black"/>
+
+    </TableRow>
+
+    <TableRow android:id="@+id/timeRow"
+              android:layout_width="fill_parent"
+	      android:layout_height="wrap_content"
+	      android:layout_margin="5dip">
+
+       <TextView android:id="@+id/timeText"
+                 android:layout_width="100dip"
+                 android:layout_height="wrap_content"
+                 android:text="Walk Time: "
+                 android:textColor="@android:color/black"/>
+
+       <EditText android:id="@+id/timeHourValue"
+                 android:layout_width="50dip"
+                 android:layout_height="wrap_content"
+                 android:text="0"
+                 android:textColor="@android:color/black"/>
+
+       <TextView android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text="h"
+                 android:textColor="@android:color/black"/>
+
+       <EditText android:id="@+id/timeMinuteValue"
+                 android:layout_width="50dip"
+                 android:layout_height="wrap_content"
+                 android:text="5"
+                 android:textColor="@android:color/black"/>
+
+       <TextView android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text="m"
+                 android:textColor="@android:color/black"/>
+
+       <EditText android:id="@+id/timeSecValue"
+                 android:layout_width="50dip"
+                 android:layout_height="wrap_content"
+                 android:text="0"
+                 android:textColor="@android:color/black"/>
+
+      <TextView android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text="s"
+                 android:textColor="@android:color/black"/>
+
+    </TableRow>
+
+    <TableRow android:id="@+id/deltaRow"
+              android:layout_width="fill_parent"
+	          android:layout_height="wrap_content"
+	          android:layout_margin="5dip">
+
+       <TextView android:id="@+id/deltaText"
+                 android:layout_width="100dip"
+                 android:layout_height="wrap_content"
+                 android:text="Say Every: "
+                 android:textColor="@android:color/black"/>
+
+       <EditText android:id="@+id/deltaValue"
+                 android:layout_width="100dip"
+                 android:layout_height="wrap_content"
+                 android:text="10"
+                 android:textColor="@android:color/black"/>
+
+       <TextView android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text=" sec "
+                 android:textColor="@android:color/white"/>
+
+    </TableRow>
+
+    <TableRow android:id="@+id/deltaRow"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:layout_margin="5dip">
+
+       <Button android:id="@+id/startButton"
+               android:text="Start"
+               android:layout_width="100dip"
+               android:layout_height="wrap_content"
+               android:layout_gravity="center_horizontal|center"/>
+
+        <Button android:id="@+id/stopButton"
+                android:text="Stop"
+                android:layout_width="100dip"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|center"/>
+
+        <Button android:id="@+id/exitButton"
+                android:text="Exit"
+                android:layout_width="100dip"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|center"/>
+
+    </TableRow>
+
+</LinearLayout>
+
