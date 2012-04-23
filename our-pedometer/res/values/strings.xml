@@ -15,4 +15,5 @@
     <string name="save.button">Save</string>
     <string name="close.button">Close</string>
     <string name="zero.value">0</string>
+    <string name="autorun">Start automatically</string>
 </resources>
