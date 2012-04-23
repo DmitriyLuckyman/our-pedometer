@@ -11,6 +11,7 @@ import android.os.RemoteException;
 import android.util.Log;
 import ru.spbau.ourpedometer.PedometerRemoteInterface;
 import ru.spbau.ourpedometer.persistens.StatisticsBean;
+import ru.spbau.ourpedometer.persistens.StatisticsCalculator;
 import ru.spbau.ourpedometer.persistens.StatisticsManager;
 import ru.spbau.ourpedometer.persistens.StatsCalculator;
 import ru.spbau.ourpedometer.settingsactivity.StepsCountActivity;
@@ -33,6 +34,9 @@ public class AccelerometerService extends Service implements SensorEventListener
         @Override
         public void onReceive(Context context, Intent intent) {
             configureTimer(intent.getIntExtra(StepsCountActivity.RATE_STRING, INTERVAL));
+            final StatisticsCalculator calculator = StatisticsManager.getCalculator();
+            calculator.setStepWidthThreshold(intent.getIntExtra(StepsCountActivity.SENSITIVITY_STRING,
+                    StepsCountActivity.DEFAULT_SENSITIVITY_VALUE));
         }
     };
 
