@@ -1,13 +1,20 @@
 package ru.spbau.ourpedometer.settingsactivity;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.TimePicker;
+import ru.spbau.ourpedometer.AccelerometerService;
 import ru.spbau.ourpedometer.R;
+
+import java.sql.Time;
+import java.util.Calendar;
 
 public class StepsCountActivity extends Activity {
     private static float MIN_SENSITIVITY = 0.0f, MAX_SENSITIVITY = 1.0f;
@@ -30,6 +37,23 @@ public class StepsCountActivity extends Activity {
 
     private SmartValue<Float> sensitivity;
     private SmartValue<Float> rate;
+
+    private TextView mTimeDisplay;
+    private Button mPickTime;
+
+    private int mHour;
+    private int mMinute;
+
+    static final int TIME_DIALOG_ID = 0;
+
+    private TimePickerDialog.OnTimeSetListener mTimeSetListener =
+            new TimePickerDialog.OnTimeSetListener() {
+                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                    mHour = hourOfDay;
+                    mMinute = minute;
+                    updateTime();
+                }
+            };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -80,90 +104,42 @@ public class StepsCountActivity extends Activity {
                 finish();
             }
         });
+        mTimeDisplay = (TextView) findViewById(R.id.timeDisplay);
+        mPickTime = (Button) findViewById(R.id.pickTime);
+        mPickTime.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                showDialog(TIME_DIALOG_ID);
+            }
+        });
+        final Calendar c = Calendar.getInstance();
+        mHour = c.get(Calendar.HOUR_OF_DAY);
+        mMinute = c.get(Calendar.MINUTE);
+        updateTime();
     }
 
-
-
-    /*private static int floatToBar (float val, float min, float max, int barMax) {
-        return (int)((val - min) / (max - min) * (float)barMax);
-    }
-    private static float barToFloat (int val, float min, float max, int barMax) {
-        float t = (float)val / (float)barMax;
-        return max * t + min * (1 - t);
-    }*/
-
-    /*Button startButton;
-
-    TextView valueX;
-    TextView valueY;
-
-
-    TextView valueZ;
-    TextView number;
-    TextView speed;
-    PedometerRemoteInterface aService;
-
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final int steps = intent.getIntExtra("steps", -1);
-            number.setText("" + steps);
-            Log.v(this.getClass().getName(), "Steps=" + steps);
-        }
-    };
-
-
-    private boolean buttonClicked;
-    private IntentFilter intentFilter = new IntentFilter(AccelerometerService.STEPS_BROADCAST_ACTION);
-    View.OnClickListener startListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            registerReceiver(broadcastReceiver, intentFilter);
-            buttonClicked = true;
-        }
-    };
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        if(buttonClicked){
-            registerReceiver(broadcastReceiver, intentFilter);
-        }
+    private void updateTime() {
+        StringBuilder sb = new StringBuilder()
+                .append(pad(mHour)).append(":")
+                .append(pad(mMinute));
+        mTimeDisplay.setText(sb);
+        sb.append(":00");
+        AccelerometerService.setTimeSinceStart(Time.valueOf(sb.toString()));
     }
 
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if(buttonClicked){
-            unregisterReceiver(broadcastReceiver);
-        }
+    private static String pad(int c) {
+        if (c >= 10)
+            return String.valueOf(c);
+        else
+            return "0" + String.valueOf(c);
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-
-        valueX = (TextView) findViewById(R.id.value_x);
-        valueY = (TextView) findViewById(R.id.value_y);
-        valueZ = (TextView) findViewById(R.id.value_z);
-        number = (TextView) findViewById(R.id.num);
-        speed = (TextView) findViewById(R.id.speed);
-
-        startButton = (Button) findViewById(R.id.button_start);
-        startButton.setOnClickListener(startListener);
+    protected Dialog onCreateDialog(int id) {
+        switch (id) {
+            case TIME_DIALOG_ID:
+                return new TimePickerDialog(this,
+                        mTimeSetListener, mHour, mMinute, false);
+        }
+        return null;
     }
-
-    class RemoteServiceConnection implements ServiceConnection {
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            aService = PedometerRemoteInterface.Stub.asInterface(service);
-        }
-
-        public void onServiceDisconnected(ComponentName className) {
-            aService = null;
-        }
-    }*/
-
 }
