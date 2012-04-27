@@ -7,5 +7,6 @@ interface PedometerRemoteInterface {
 
     int getSteps();
     float getSpeed();
-
+    float getMaxSpeed();
+    float getMinSpeed();
 }

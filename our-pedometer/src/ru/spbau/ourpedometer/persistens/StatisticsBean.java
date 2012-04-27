@@ -1,27 +1,32 @@
 package ru.spbau.ourpedometer.persistens;
 
 public class StatisticsBean {
-    private Float[] coordinates;
-    private Long time;  // msec
+    private float[] coordinates;
+    private long time;
 
     public StatisticsBean(Float x, Float y, Float z, Long time){
-        coordinates = new Float[]{x, y, z};
+        coordinates = new float[]{x, y, z};
         this.time = time;
     }
 
-    public Float x(){
+    public StatisticsBean(float[] coordinates, long time) {
+        this.coordinates = coordinates;
+        this.time = time;
+    }
+
+    public float x(){
         return coordinates[0];
     }
 
-    public Float y(){
+    public float y(){
         return coordinates[1];
     }
 
-    public Float z(){
+    public float z(){
         return coordinates[2];
     }
 
-    public Long time(){
+    public long time(){
         return time;
     }
 }

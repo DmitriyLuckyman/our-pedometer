@@ -22,13 +22,6 @@ public class SmartValue<T> {
             listener.onValueChanged(value);
     }
 
-    public void setValue(T value, SmartValueListener<T> ignore) {
-        this.value = value;
-        for (SmartValueListener<T> listener : listeners)
-            if (listener != ignore)
-                listener.onValueChanged(value);
-    }
-
     public void addListener(SmartValueListener<T> listener) {
         if (listener == null)
             throw new NullPointerException();

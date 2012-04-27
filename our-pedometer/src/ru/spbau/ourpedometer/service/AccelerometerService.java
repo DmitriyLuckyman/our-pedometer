@@ -6,165 +6,91 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.media.AudioManager;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.speech.tts.TextToSpeech;
-import android.text.Editable;
 import android.util.Log;
-import android.widget.EditText;
 import ru.spbau.ourpedometer.PedometerRemoteInterface;
 import ru.spbau.ourpedometer.persistens.StatisticsBean;
 import ru.spbau.ourpedometer.persistens.StatisticsCalculator;
 import ru.spbau.ourpedometer.persistens.StatisticsManager;
 import ru.spbau.ourpedometer.settingsactivity.StepsCountActivity;
 
-import java.sql.Time;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
-public class AccelerometerService extends Service implements SensorEventListener, TextToSpeech.OnInitListener {
+public class AccelerometerService extends Service implements SensorEventListener{
+    public static final String LOG_TAG = "PEDOMETER";
 
-    public static final int FIRST_RUN = 2000;
-    public static final int INTERVAL = 5000;
+    public static final String STEPS_BROADCAST_ACTION = "ru.spbau.ourpedometer.ACCELEROMETER_BROADCAST";
+
     public static final String STEPS_KEY = "steps";
     public static final String SPEED_KEY = "speed";
+    public static final String MIN_SPEED_KEY = "minSpeed";
+    public static final String MAX_SPEED_KEY = "maxSpeed";
+
+    public static final boolean DEFAULT_AUTORUN_VALUE = false;
+    public static final int DEFAULT_RATE_VALUE = 1;
+    public static final int DEFAULT_SENSITIVITY_VALUE = 40;
+    public static final int DEFAULT_V_SENSITIVITY_VALUE = 2;
+    public static final int DEFAULT_INTERVAL_VALUE = 5000;
+    public static final int FIRST_RUN = 2000;
+
     private SensorManager sensorManager;
+
     private Sensor accelerometerSensor;
+
     private Timer timer;
 
-    private static Time timeSinceStart;
-
-        private int MY_DATA_CHECK_CODE = 0;
-        private TextToSpeech tts = null;
-        HashMap<String, String> hashAlarm = null;
-
-        private float maxSpeed = 4;
-        private float minSpeed = 1;
-        private int stepsCount = 900;
-        private long totalTime = 5 * 60 * 1000;
-        private long deltaSayTime = 20 * 1000;
-
-        private boolean init = false;
-        public static final String STEPS_BROADCAST_ACTION = "ru.spbau.ourpedometer.ACCELEROMETER_BROADCAST";
-        private boolean isBroadCastRegister = false;
-
-        private int delta = 0;
-        private int remSteps = stepsCount;
-        private long lastSayTime = 0;
-        private long startTime;
-        private double speed = 0;
-
-        private boolean isShouldSay = false;
-
-        private float getValue(EditText editText) {
-            Editable text = null;
-            if (editText != null) {
-                text = editText.getText();
-            }
-            if (text != null) {
-                return Float.valueOf(text.toString());
-            }
-            return -1;
-        }
-
+    private final TimerTask sendBroadcastTask = new TimerTask() {
         @Override
-        public void onInit(int status) {
-            if (status == TextToSpeech.SUCCESS) {
-
-                int result = tts.setLanguage(Locale.US);
-                if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-
-                    Intent installIntent = new Intent();
-                    installIntent.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
-                    startService(installIntent);
-                } else {
-                }
-
-            } else if (status == TextToSpeech.ERROR) {
+        public void run() {
+            try {
+                Intent intent = new Intent(STEPS_BROADCAST_ACTION);
+                final StatisticsCalculator calculator = StatisticsManager.getCalculator();
+                final Date startTime = startDate();
+                final Date stopTime = new Date();
+                intent.putExtra(STEPS_KEY,     calculator.steps(startTime, stopTime));
+                intent.putExtra(SPEED_KEY,     calculator.speed(startTime, stopTime, TimeUnit.SECONDS));
+                intent.putExtra(MIN_SPEED_KEY, calculator.minSpeed(startTime, stopTime, TimeUnit.SECONDS));
+                intent.putExtra(MAX_SPEED_KEY, calculator.maxSpeed(startTime, stopTime, TimeUnit.SECONDS));
+                sendBroadcast(intent);
+            } catch (Exception ex) {
+                Log.e(LOG_TAG, "Error while send a broadcast" + ex.getMessage(), ex);
             }
-        }
-
-
-        private void start() {
-            isShouldSay = true;
-
-            if (tts == null) {
-            } else {
-
-                tts.speak("Let`s go!", TextToSpeech.QUEUE_FLUSH, hashAlarm);
-
-                lastSayTime = Calendar.getInstance().getTimeInMillis();
-                startTime = lastSayTime;
-
-                if (!isBroadCastRegister) {
-
-                    registerReceiver(new BroadcastReceiver() {
-                        @Override
-                        public void onReceive(Context context, Intent intent) {
-                            if (Calendar.getInstance().getTimeInMillis() - lastSayTime >= deltaSayTime && isShouldSay) {
-                                delta = intent.getIntExtra("steps", -1);
-                                double newSpeed = intent.getIntExtra("speed", -1);
-                                if (Math.abs(newSpeed - speed) > 1) {
-                                    tts.speak("Your speed has become greater on "+(newSpeed - speed),
-                                            TextToSpeech.QUEUE_FLUSH, hashAlarm);
-                                    speed = newSpeed;
-                                }
-                                remSteps = stepsCount - delta;
-                                if (remSteps < 0) {
-                                    remSteps = 0;
-                                    isShouldSay = false;
-                                }
-                                tts.speak("Remaining " + remSteps + " steps!", TextToSpeech.QUEUE_FLUSH, hashAlarm);
-                                try {
-                                    Thread.sleep(5000);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-
-                                lastSayTime += deltaSayTime;
-
-                            }
-                            if (Calendar.getInstance().getTimeInMillis() - startTime >= totalTime) {
-                                isShouldSay = false;
-                            }
-                        }
-                    }, new IntentFilter(STEPS_BROADCAST_ACTION));
-                }
-            }
-        }
-
-
-    private BroadcastReceiver configChangeReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            configureTimer(intent.getIntExtra(StepsCountActivity.RATE_STRING, INTERVAL));
-            final StatisticsCalculator calculator = StatisticsManager.getCalculator();
-            calculator.setStepWidthThreshold(intent.getIntExtra(StepsCountActivity.SENSITIVITY_STRING,
-                    StepsCountActivity.DEFAULT_SENSITIVITY_VALUE));
         }
     };
 
-    private IntentFilter configChangeIntentFilter = new IntentFilter(StepsCountActivity.OURPEDOMETER_CONFIG_CHANGED);
+    private static long startTimeInMillis;
+
+    final private BroadcastReceiver configChangeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(final Context context, final Intent intent) {
+            configureTimer(intent.getIntExtra(StepsCountActivity.INTERVAL_KEY, DEFAULT_INTERVAL_VALUE));
+            final StatisticsCalculator calculator = StatisticsManager.getCalculator();
+            calculator.setStepWidthThreshold(intent.getIntExtra(StepsCountActivity.SENSITIVITY_KEY,
+                    DEFAULT_SENSITIVITY_VALUE));
+            calculator.setStepHeightThreshold(intent.getIntExtra(StepsCountActivity.V_SENSITIVITY_KEY,
+                    DEFAULT_V_SENSITIVITY_VALUE));
+            startTimeInMillis = intent.getLongExtra(StepsCountActivity.TIME_KEY, System.currentTimeMillis());
+        }
+    };
+
+    final private IntentFilter configChangeIntentFilter = new IntentFilter(StepsCountActivity.OURPEDOMETER_CONFIG_CHANGED);
 
     @Override
     public void onCreate() {
         super.onCreate();
         startService();
         startDate();
-        Log.v(this.getClass().getName(), "onCreate(..)");
-        tts = new TextToSpeech(this, this);
-
-        hashAlarm = new HashMap();
-        hashAlarm.put(TextToSpeech.Engine.KEY_PARAM_STREAM,
-                String.valueOf(AudioManager.STREAM_MUSIC));
-
-        start();
+        Log.v(LOG_TAG, "Pedometer Service Started");
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.v(this.getClass().getName(), "onBind(..)");
+        Log.v(LOG_TAG, "Bind Performed");
         return mBinder;
     }
 
@@ -172,12 +98,19 @@ public class AccelerometerService extends Service implements SensorEventListener
     public void onDestroy() {
         timer.cancel();
         sensorManager.unregisterListener(this, accelerometerSensor);
-        if (tts != null) {
-            tts.stop();
-            tts.shutdown();
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        if (Sensor.TYPE_ACCELEROMETER == sensorEvent.sensor.getType()) {
+            StatisticsBean statisticsBean = new StatisticsBean(sensorEvent.values, System.currentTimeMillis());
+            StatisticsManager.getSaver().save(statisticsBean);
+            Log.v(LOG_TAG, "saveStatistics");
         }
+    }
 
-
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
     }
 
     private void configureTimer(int interval) {
@@ -187,24 +120,7 @@ public class AccelerometerService extends Service implements SensorEventListener
         }
 
         timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    Intent intent = new Intent(STEPS_BROADCAST_ACTION);
-                    final StatisticsCalculator calculator = StatisticsManager.getCalculator();
-                    final Date startTime = startDate();
-                    final Date stopTime = new Date();
-                    intent.putExtra(STEPS_KEY,
-                            calculator.steps(startTime, stopTime));
-                    intent.putExtra(SPEED_KEY, calculator.speed(startTime, stopTime, TimeUnit.SECONDS));
-                    sendBroadcast(intent);
-                } catch (Exception ex) {
-                    Log.d(AccelerometerService.class.getName(), ex.getMessage());
-                }
-            }
-        }, FIRST_RUN, interval);
-
+        timer.schedule(sendBroadcastTask, FIRST_RUN, interval);
     }
 
     private void startService() {
@@ -225,23 +141,9 @@ public class AccelerometerService extends Service implements SensorEventListener
             }
             registerReceiver(configChangeReceiver, configChangeIntentFilter);
             final SharedPreferences sharedPreferences = getSharedPreferences(StepsCountActivity.PREFS_NAME, MODE_PRIVATE);
-            final int interval = sharedPreferences.getInt(StepsCountActivity.SENSITIVITY_STRING, INTERVAL);
+            final int interval = sharedPreferences.getInt(StepsCountActivity.INTERVAL_KEY, DEFAULT_INTERVAL_VALUE);
             configureTimer(interval);
         }
-    }
-
-    @Override
-    public void onSensorChanged(SensorEvent sensorEvent) {
-        if (Sensor.TYPE_ACCELEROMETER == sensorEvent.sensor.getType()) {
-            StatisticsBean statisticsBean = new StatisticsBean(sensorEvent.values[0],
-                    sensorEvent.values[1], sensorEvent.values[2], System.currentTimeMillis());
-            StatisticsManager.getSaver().save(statisticsBean);
-            Log.v(this.getClass().getName(), "saveStatistics");
-        }
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int i) {
     }
 
     private final PedometerRemoteInterface.Stub mBinder = new PedometerRemoteInterface.Stub() {
@@ -256,29 +158,19 @@ public class AccelerometerService extends Service implements SensorEventListener
             return StatisticsManager.getCalculator().speed(startDate(), new Date(), TimeUnit.SECONDS);
         }
 
+        @Override
+        public float getMaxSpeed() throws RemoteException {
+            return StatisticsManager.getCalculator().maxSpeed(startDate(), new Date(), TimeUnit.SECONDS);
+        }
+
+        @Override
+        public float getMinSpeed() throws RemoteException {
+            return StatisticsManager.getCalculator().minSpeed(startDate(), new Date(), TimeUnit.SECONDS);
+        }
+
     };
 
-    public static void setTimeSinceStart(Time timeSinceStart) {
-        AccelerometerService.timeSinceStart = timeSinceStart;
-    }
-
-    public static Time getTimeSinceStart() {
-        return timeSinceStart;
-    }
-
-    public static Date startDate() {
-        Calendar cal = Calendar.getInstance();
-        if (timeSinceStart == null) {
-            cal.set(Calendar.HOUR_OF_DAY, 0);
-            cal.set(Calendar.MINUTE, 0);
-            cal.set(Calendar.SECOND, 0);
-            return cal.getTime();
-        }
-        Calendar change = Calendar.getInstance();
-        change.setTime(timeSinceStart);
-        cal.set(Calendar.HOUR_OF_DAY, change.get(Calendar.HOUR_OF_DAY));
-        cal.set(Calendar.MINUTE, change.get(Calendar.MINUTE));
-        cal.set(Calendar.SECOND, change.get(Calendar.SECOND));
-        return cal.getTime();
+   private Date startDate() {
+        return new Date(startTimeInMillis);
     }
 }
